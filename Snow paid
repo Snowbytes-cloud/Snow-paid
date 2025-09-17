@@ -52,20 +52,20 @@ local window = library:AddWindow("Snow paid", {
 -- aba principal
 local page = window:AddTab("Principal")
 
--- aba de status
-local statusPage = window:AddTab("Status")
-
 -- variável de controle
 local fastRebirth = false
+local rebirthsAtivado = 0
 
--- cria um label para status
-local statusLabel = statusPage:AddLabel("Fast Rebirth: Desativado")
+-- label de status
+local statusLabel = page:AddLabel("Fast Rebirth: Desativado")
+local countLabel = page:AddLabel("Rebirths ganhos: 0")
 
 -- cria o botão/toggle para ativar/desativar
 page:AddToggle("Fast Rebirth", function(state)
     fastRebirth = state
-    -- atualiza o label de status
+    rebirthsAtivado = 0 -- reseta contagem ao ativar
     statusLabel:SetText("Fast Rebirth: " .. (fastRebirth and "Ativado" or "Desativado"))
+    countLabel:SetText("Rebirths ganhos: 0")
 
     if fastRebirth then
         spawn(function()
@@ -150,6 +150,12 @@ page:AddToggle("Fast Rebirth", function(state)
                     a.rEvents.rebirthRemote:InvokeServer("rebirthRequest")
                     task.wait(0.1)
                 until c.leaderstats.Rebirths.Value > beforeRebirth or not fastRebirth
+
+                -- se conseguiu dar rebirth, atualiza contador
+                if c.leaderstats.Rebirths.Value > beforeRebirth then
+                    rebirthsAtivado = rebirthsAtivado + 1
+                    countLabel:SetText("Rebirths ganhos: " .. rebirthsAtivado)
+                end
             end
         end)
     end
