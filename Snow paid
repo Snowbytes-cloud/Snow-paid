@@ -50,7 +50,17 @@ local window = library:AddWindow("Snow paid", {
 })
 
 -- aba principal
-local page = window:AddTab("Principal")
+local page = window:AddTab("Main")
+
+-- adiciona logo como banner (ImageLabel)
+do
+    local banner = Instance.new("ImageLabel")
+    banner.Size = UDim2.new(0, 600, 0, 150) -- largura/altura
+    banner.Position = UDim2.new(0.5, -300, 0, 10) -- centralizado no topo
+    banner.BackgroundTransparency = 1
+    banner.Image = "rbxasset://banner baratinnato.png" -- 🔴 aqui precisa ser assetId do Roblox
+    banner.Parent = window.gui -- adiciona na interface da lib
+end
 
 -- variável de controle
 local fastRebirth = false
