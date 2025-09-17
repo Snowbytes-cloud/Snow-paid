@@ -141,13 +141,5 @@ RebirthTab:AddSwitch("Fast Rebirth", function(bool)
         end)
     end
 end)
-
-                -- se conseguiu dar rebirth, atualiza contador
-                if c.leaderstats.Rebirths.Value > beforeRebirth then
-                    rebirthsAtivado = rebirthsAtivado + 1
-                    countLabel:SetText("Rebirths ganhos: " .. rebirthsAtivado)
-                end
-            end
-        end)
     end
 end)
