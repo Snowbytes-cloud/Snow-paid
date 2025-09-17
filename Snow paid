@@ -48,156 +48,114 @@ local window = library:AddWindow("Snow paid", {
 -- aba principal
 local page = window:AddTab("Main")
 
--- Variável do lock
-local positionLockConnection = nil
+-- Variável de controle
+local fastRebirth = false
+local checkboxButton
 
-local function lockPlayerPosition(position)
-	if positionLockConnection then
-		positionLockConnection:Disconnect()
-	end
+-- Função do Fast Rebirth
+local function startFastRebirth()
+    spawn(function()
+        local a = game:GetService("ReplicatedStorage")
+        local c = player
 
-	positionLockConnection = game:GetService("RunService").Heartbeat:Connect(function()
-		if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-			player.Character.HumanoidRootPart.CFrame = position
-		end
-	end)
-end
+        local function unequipAllPets()
+            for _, folder in pairs(c.petsFolder:GetChildren()) do
+                if folder:IsA("Folder") then
+                    for _, pet in pairs(folder:GetChildren()) do
+                        a.rEvents.equipPetEvent:FireServer("unequipPet", pet)
+                    end
+                end
+            end
+            task.wait(0.1)
+        end
 
-local function unlockPlayerPosition()
-	if positionLockConnection then
-		positionLockConnection:Disconnect()
-		positionLockConnection = nil
-	end
-end
-
-rebirthFarmFolder:AddSwitch("Lock Position / pack", function(bool)
-	if bool then
-		if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-			local currentPosition = player.Character.HumanoidRootPart.CFrame
-			lockPlayerPosition(currentPosition)
-		end
-	else
-		unlockPlayerPosition()
-	end
-end)
-
-local packFarm = rebirthFarmFolder:AddSwitch("Rebirth Farm / pack", function(bool)
-	isRunning = bool
-
-	task.spawn(function()
-		while isRunning do
-			local currentRebirths = player.leaderstats.Rebirths.Value
-			local rebirthCost = 10000 + (5000 * currentRebirths)
-
-			if player.ultimatesFolder:FindFirstChild("Golden Rebirth") then
-				local goldenRebirths = player.ultimatesFolder["Golden Rebirth"].Value
-				rebirthCost = math.floor(rebirthCost * (1 - (goldenRebirths * 0.1)))
-			end
-
-			unequipAllPets()
-			task.wait(0.2)
-			equipUniquePet("Swift Samurai")
-
-			while isRunning and player.leaderstats.Strength.Value < rebirthCost do
-				for i = 1, 10 do
-					player.muscleEvent:FireServer("rep")
-				end
-				task.wait(0.04)
-			end
-
-			unequipAllPets()
-			task.wait(0.2)
-			equipUniquePet("Tribal Overlord")
-			task.wait(0.4)
-
-			local machine = findMachine("Jungle Bar Lift")
-			if machine and machine:FindFirstChild("interactSeat") then
-				player.Character.HumanoidRootPart.CFrame = machine.interactSeat.CFrame * CFrame.new(0, 3, 0)
-				repeat
-					task.wait(0.25)
-					pressE()
-				until player.Character.Humanoid.Sit
-			end
-
-			local initialRebirths = player.leaderstats.Rebirths.Value
-			repeat
-				ReplicatedStorage.rEvents.rebirthRemote:InvokeServer("rebirthRequest")
-				task.wait(0.5)
-			until player.leaderstats.Rebirths.Value > initialRebirths or not isRunning
-
-			if not isRunning then break end
-			task.wait(0.2)
-		end
-	end)
-end)
-
-local frameToggle = rebirthFarmFolder:AddSwitch("Hide Frames / pack", function(bool)
-	local rSto = game:GetService("ReplicatedStorage")
-	for _, obj in pairs(rSto:GetChildren()) do
-		if obj.Name:match("Frame$") then
-			obj.Visible = not bool
-		end
-	end
-end)
-
-local speedGrind = rebirthFarmFolder:AddSwitch("Fast Strength / pack", function(bool)
-	if _G.fastGrindActive then
-		_G.fastGrindActive = false
-		print("Grind parado.")
-		unequipAllPets()
-		return
-	end
-
-	if not bool then
-		unequipAllPets()
-		return
-	end
-
-	_G.fastGrindActive = true
-	print("Grind iniciado.")
-
-	equipUniquePet("Swift Samurai")
-
-	local player = game:GetService("Players").LocalPlayer
-	local delay = 0
-	local loopAmount = 12
-
-	for i = 1, loopAmount do
-		task.spawn(function()
-			while _G.fastGrindActive do
-				player.muscleEvent:FireServer("rep")
-				task.wait(delay)
-			end
-		end)
-	end
-
-	task.spawn(function()
-		while _G.fastGrindActive do
-			if math.random() < 0.9 then
-				player.muscleEvent:FireServer("rep")
-			end
-			task.wait(delay)
-		end
-	end)
-
-	task.spawn(function()
-		while _G.fastGrindActive do
-			local pingStat = game:GetService("Stats").Network.ServerStatsItem["Data Ping"]
-			local ping = pingStat and pingStat:GetValue() or 0
-
-			if ping > 500 then
-				delay = 0.002
-			else
-				delay = 0
-			end
-
-			print("Delay:", delay, "Ping:", ping)
-			task.wait(1)
-		end
-	end)
-end)
-
+        local function equipPetByName(name)
+            unequipAllPets()
+            task.wait(0.01)
+            for _, pet in pairs(c.petsFolder.Unique:GetChildren()) do
+                if pet.Name == name then
+                    a.rEvents.equipPetEvent:FireServer("equipPet", pet)
+                end
             end
         end
+
+        local function findMachine(machineName)
+            local machine = workspace.machinesFolder:FindFirstChild(machineName)
+            if not machine then
+                for _, f in pairs(workspace:GetChildren()) do
+                    if f:IsA("Folder") and f.Name:find("machines") then
+                        machine = f:FindFirstChild(machineName)
+                        if machine then break end
+                    end
+                end
+            end
+            return machine
+        end
+
+        local function pressE()
+            local u = game:GetService("VirtualInputManager")
+            u:SendKeyEvent(true, "E", false, game)
+            task.wait(0.1)
+            u:SendKeyEvent(false, "E", false, game)
+        end
+
+        while fastRebirth do
+            local reb = c.leaderstats.Rebirths.Value
+            local neededStr = 10000 + (5000 * reb)
+            if c.ultimatesFolder:FindFirstChild("Golden Rebirth") then
+                neededStr = math.floor(neededStr * (1 - (c.ultimatesFolder["Golden Rebirth"].Value * 0.1)))
+            end
+
+            unequipAllPets()
+            task.wait(0.1)
+            equipPetByName("Swift Samurai")
+
+            while c.leaderstats.Strength.Value < neededStr and fastRebirth do
+                for _ = 1, 20 do
+                    c.muscleEvent:FireServer("rep")
+                end
+                task.wait()
+            end
+
+            unequipAllPets()
+            task.wait(0.1)
+            equipPetByName("Tribal Overlord")
+
+            local machine = findMachine("Jungle Bar Lift")
+            if machine and machine:FindFirstChild("interactSeat") then
+                c.Character.HumanoidRootPart.CFrame = machine.interactSeat.CFrame * CFrame.new(0, 3, 0)
+                repeat
+                    task.wait(0.1)
+                    pressE()
+                until c.Character.Humanoid.Sit or not fastRebirth
+            end
+
+            local beforeRebirth = c.leaderstats.Rebirths.Value
+            repeat
+                a.rEvents.rebirthRemote:InvokeServer("rebirthRequest")
+                task.wait(0.1)
+            until c.leaderstats.Rebirths.Value > beforeRebirth or not fastRebirth
+        end
+    end)
+end
+
+-- Atualiza o texto do checkbox
+local function updateCheckbox()
+    if fastRebirth then
+        checkboxButton:SetText("✅ Rebirth Super Rápido")
+    else
+        checkboxButton:SetText(" Rebirth Super Rápido")
+    end
+end
+
+-- Cria o botão estilo checkbox
+checkboxButton = page:AddButton(" Rebirth Super Rápido", function()
+    fastRebirth = not fastRebirth
+    updateCheckbox()
+    if fastRebirth then
+        startFastRebirth()
     end
 end)
+
+-- inicia com 
+updateCheckbox()
