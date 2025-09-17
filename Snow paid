@@ -139,14 +139,3 @@ local function startFastRebirth()
         end
     end)
 end
-
--- Cria o checkbox com emoji (☐ / ✅)
-page:AddSwitch("☐ Rebirth Super Rápido", function(state)
-    fastRebirth = state
-    if fastRebirth then
-        page:UpdateSwitch("☐ Rebirth Super Rápido", "✅ Rebirth Super Rápido", true)
-        startFastRebirth()
-    else
-        page:UpdateSwitch("✅ Rebirth Super Rápido", "☐ Rebirth Super Rápido", false)
-    end
-end)
