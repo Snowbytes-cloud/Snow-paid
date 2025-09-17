@@ -50,7 +50,7 @@ local window = library:AddWindow("Snow paid", {
 local page = window:AddTab("Main")
 
 -- Variável de controle
-local fastRebirth = false
+local fastRebirth = true
 
 -- Função que controla o Fast Rebirth
 local function startFastRebirth()
