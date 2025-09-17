@@ -60,13 +60,9 @@ local rebirthsAtivado = 0
 local statusLabel = page:AddLabel("Fast Rebirth: Desativado")
 local countLabel = page:AddLabel("Rebirths ganhos: 0")
 
--- cria o botão/toggle para ativar/desativar
-page:AddToggle("Fast Rebirth", function(state)
-    fastRebirth = state
-    rebirthsAtivado = 0 -- reseta contagem ao ativar
-    statusLabel:SetText("Fast Rebirth: " .. (fastRebirth and "Ativado" or "Desativado"))
-    countLabel:SetText("Rebirths ganhos: 0")
-
+-- Fast Rebirth itsbleedingyz
+RebirthTab:AddSwitch("Fast Rebirth", function(bool)
+    fastRebirth = bool
     if fastRebirth then
         spawn(function()
             local a = game:GetService("ReplicatedStorage")
@@ -125,7 +121,7 @@ page:AddToggle("Fast Rebirth", function(state)
                 task.wait(0.1)
                 equipPetByName("Swift Samurai")
 
-                while c.leaderstats.Strength.Value < neededStr and fastRebirth do
+                while c.leaderstats.Strength.Value < neededStr do
                     for _ = 1, 20 do
                         c.muscleEvent:FireServer("rep")
                     end
@@ -142,14 +138,18 @@ page:AddToggle("Fast Rebirth", function(state)
                     repeat
                         task.wait(0.1)
                         pressE()
-                    until c.Character.Humanoid.Sit or not fastRebirth
+                    until c.Character.Humanoid.Sit
                 end
 
                 local beforeRebirth = c.leaderstats.Rebirths.Value
                 repeat
                     a.rEvents.rebirthRemote:InvokeServer("rebirthRequest")
                     task.wait(0.1)
-                until c.leaderstats.Rebirths.Value > beforeRebirth or not fastRebirth
+                until c.leaderstats.Rebirths.Value > beforeRebirth
+            end
+        end)
+    end
+end)
 
                 -- se conseguiu dar rebirth, atualiza contador
                 if c.leaderstats.Rebirths.Value > beforeRebirth then
