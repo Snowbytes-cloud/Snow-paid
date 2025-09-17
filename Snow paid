@@ -48,10 +48,6 @@ local window = library:AddWindow("Snow paid", {
 -- aba principal
 local page = window:AddTab("Main")
 
-rebirthFarmFolder:AddTextBox("Target Rebirth )", function(text)
-	targetRebirth = tonumber(text) or math.huge
-end)
-
 -- Variável do lock
 local positionLockConnection = nil
 
