@@ -141,5 +141,3 @@ RebirthTab:AddSwitch("Fast Rebirth", function(bool)
         end)
     end
 end)
-    end
-end)
