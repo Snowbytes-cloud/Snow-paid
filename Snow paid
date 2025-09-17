@@ -25,7 +25,7 @@ for _, name in ipairs(whitelist) do
 end
 
 if not allowed then
-    Player:Kick("Você não está autorizado para Usar esse Script.")
+    Player:Kick("Você não está autorizado para Usar esse Script compra ou pessa ao dono.")
     return
 end
 
