@@ -36,11 +36,10 @@ local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/556ii
 
 local player = Players.LocalPlayer
 local leaderstats = player:WaitForChild("leaderstats", 5)
-local startRebirths = leaderstats and leaderstats:FindFirstChild("Rebirths") and leaderstats.Rebirths.Value or 0
 local displayName = player.DisplayName
 
 -- cria a janela
-local window = library:AddWindow("Snow paid", {
+local window = library:AddWindow("Snow Paid", {
     main_color = Color3.fromRGB(0, 255, 255), -- ciano
     min_size   = Vector2.new(660, 660),
     can_resize = false
@@ -51,7 +50,6 @@ local page = window:AddTab("Main")
 
 -- Variável de controle
 local fastRebirth = false
-local fastButton -- referência do botão para poder mudar o texto
 
 -- Função que controla o Fast Rebirth
 local function startFastRebirth()
@@ -141,13 +139,10 @@ local function startFastRebirth()
     end)
 end
 
--- Cria o botão dinâmico dentro da aba "Main"
-fastButton = page:AddButton("Ativar Fast Rebirth", function()
-    fastRebirth = not fastRebirth
+-- ✅ Checkbox para ativar/desativar Fast Rebirth
+page:AddSwitch("Fast Rebirth", function(bool)
+    fastRebirth = bool
     if fastRebirth then
-        fastButton:SetText("Desativar Fast Rebirth")
         startFastRebirth()
-    else
-        fastButton:SetText("Ativar Fast Rebirth")
     end
 end)
