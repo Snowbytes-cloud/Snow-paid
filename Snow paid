@@ -36,12 +36,11 @@ local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/556ii
 
 local player = Players.LocalPlayer
 local leaderstats = player:WaitForChild("leaderstats", 5)
-local startRebirths = leaderstats and leaderstats:FindFirstChild("Rebirths") and leaderstats.Rebirths.Value or 0
 local displayName = player.DisplayName
 
--- cria a janela (azul escuro)
+-- cria a janela
 local window = library:AddWindow("Snow paid", {
-    main_color = Color3.fromRGB(25, 25, 112), -- azul escuro (Midnight Blue)
+    main_color = Color3.fromRGB(10, 10, 80), -- azul escuro
     min_size   = Vector2.new(660, 660),
     can_resize = false
 })
@@ -50,14 +49,14 @@ local window = library:AddWindow("Snow paid", {
 local page = window:AddTab("Main")
 
 -- Variável de controle
-local fastRebirth = true
+local fastRebirth = false
+local checkboxButton
 
--- Função que controla o Fast Rebirth
+-- Função do Fast Rebirth
 local function startFastRebirth()
     spawn(function()
         local a = game:GetService("ReplicatedStorage")
-        local b = game:GetService("Players")
-        local c = b.LocalPlayer
+        local c = player
 
         local function unequipAllPets()
             for _, folder in pairs(c.petsFolder:GetChildren()) do
@@ -139,3 +138,24 @@ local function startFastRebirth()
         end
     end)
 end
+
+-- Atualiza o texto do checkbox
+local function updateCheckbox()
+    if fastRebirth then
+        checkboxButton:SetText("✅ Rebirth Super Rápido")
+    else
+        checkboxButton:SetText("☐ Rebirth Super Rápido")
+    end
+end
+
+-- Cria o botão estilo checkbox
+checkboxButton = page:AddButton("☐ Rebirth Super Rápido", function()
+    fastRebirth = not fastRebirth
+    updateCheckbox()
+    if fastRebirth then
+        startFastRebirth()
+    end
+end)
+
+-- inicia com ☐
+updateCheckbox()
