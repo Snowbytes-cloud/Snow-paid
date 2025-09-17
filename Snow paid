@@ -159,3 +159,29 @@ end)
 
 -- inicia com ☐
 updateCheckbox()
+
+-- cria a aba de status
+local statusTab = window:AddTab("Status")
+
+-- cria labels para mostrar status em tempo real
+local strengthLabel = statusTab:AddLabel("Strength: 0")
+local durabilityLabel = statusTab:AddLabel("Durability: 0")
+local rebirthsLabel = statusTab:AddLabel("Rebirths: 0")
+
+-- função para atualizar os valores
+task.spawn(function()
+    while task.wait(1) do -- atualiza a cada 1s
+        local stats = player:FindFirstChild("leaderstats")
+        if stats then
+            if stats:FindFirstChild("Strength") then
+                strengthLabel:SetText("Strength: " .. stats.Strength.Value)
+            end
+            if stats:FindFirstChild("Durability") then
+                durabilityLabel:SetText("Durability: " .. stats.Durability.Value)
+            end
+            if stats:FindFirstChild("Rebirths") then
+                rebirthsLabel:SetText("Rebirths: " .. stats.Rebirths.Value)
+            end
+        end
+    end
+end)
