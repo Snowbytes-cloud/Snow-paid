@@ -15,10 +15,24 @@ local window = library:AddWindow("Snow paid", {
     can_resize = false
 })
 
--- cria uma aba/página
+-- aba principal
 local page = window:AddTab("Principal")
 
-fastRebirth = bool
+-- aba de status
+local statusPage = window:AddTab("Status")
+
+-- variável de controle
+local fastRebirth = false
+
+-- cria um label para status
+local statusLabel = statusPage:AddLabel("Fast Rebirth: Desativado")
+
+-- cria o botão/toggle para ativar/desativar
+page:AddToggle("Fast Rebirth", function(state)
+    fastRebirth = state
+    -- atualiza o label de status
+    statusLabel:SetText("Fast Rebirth: " .. (fastRebirth and "Ativado" or "Desativado"))
+
     if fastRebirth then
         spawn(function()
             local a = game:GetService("ReplicatedStorage")
@@ -77,7 +91,7 @@ fastRebirth = bool
                 task.wait(0.1)
                 equipPetByName("Swift Samurai")
 
-                while c.leaderstats.Strength.Value < neededStr do
+                while c.leaderstats.Strength.Value < neededStr and fastRebirth do
                     for _ = 1, 20 do
                         c.muscleEvent:FireServer("rep")
                     end
@@ -94,16 +108,15 @@ fastRebirth = bool
                     repeat
                         task.wait(0.1)
                         pressE()
-                    until c.Character.Humanoid.Sit
+                    until c.Character.Humanoid.Sit or not fastRebirth
                 end
 
                 local beforeRebirth = c.leaderstats.Rebirths.Value
                 repeat
                     a.rEvents.rebirthRemote:InvokeServer("rebirthRequest")
                     task.wait(0.1)
-                until c.leaderstats.Rebirths.Value > beforeRebirth
+                until c.leaderstats.Rebirths.Value > beforeRebirth or not fastRebirth
             end
         end)
     end
 end)
-
