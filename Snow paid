@@ -51,14 +51,6 @@ local window = library:AddWindow("Snow paid", {
 -- aba principal
 local page = window:AddTab("Main")
 
--- variável de controle
-local fastRebirth = false
-local rebirthsAtivado = 0
-
--- label de status
-local statusLabel = page:AddLabel("Fast Rebirth: Desativado")
-local countLabel = page:AddLabel("Rebirths ganhos: 0")
-
 -- Fast Rebirth itsbleedingyz
 RebirthTab:AddSwitch("Fast Rebirth", function(bool)
     fastRebirth = bool
