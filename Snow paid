@@ -1,0 +1,51 @@
+-- carregar a library (já está no jogo pelo seu arquivo)
+local library = getgenv().library or library -- garante que existe
+
+-- cria uma janela
+local window = library:AddWindow("Meu Script", {
+    main_color = Color3.fromRGB(200, 100, 100), -- cor principal
+    min_size = Vector2.new(400, 300),
+    toggle_key = Enum.KeyCode.RightShift, -- tecla para abrir/fechar
+    can_resize = true
+})
+
+-- adiciona uma aba
+local aba1 = window:AddTab("Principal")
+
+-- adiciona um botão
+aba1:AddButton("Ativar algo", function()
+    print("Botão clicado!")
+end)
+
+-- adiciona um switch (liga/desliga)
+local switch, switch_obj = aba1:AddSwitch("GodMode", function(state)
+    print("GodMode:", state)
+end)
+
+-- adiciona um slider
+local slider, slider_obj = aba1:AddSlider("Velocidade", function(value)
+    print("Velocidade =", value)
+end, {min = 16, max = 200})
+
+-- adiciona um dropdown
+local drop, drop_obj = aba1:AddDropdown("Escolha algo", function(choice)
+    print("Escolheu:", choice)
+end)
+drop:Add("Opção 1")
+drop:Add("Opção 2")
+drop:Add("Opção 3")
+
+-- adiciona um textbox
+aba1:AddTextBox("Digite algo", function(text)
+    print("Você digitou:", text)
+end)
+
+-- adiciona um keybind
+aba1:AddKeybind("Keybind Teste", function(key)
+    print("Você apertou:", key.Name)
+end, {standard = Enum.KeyCode.K})
+
+-- adiciona um color picker
+aba1:AddColorPicker(function(color)
+    print("Nova cor:", color)
+end)
