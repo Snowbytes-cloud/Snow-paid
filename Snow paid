@@ -50,7 +50,6 @@ local page = window:AddTab("Main")
 
 -- Variável de controle
 local fastRebirth = false
-local checkboxButton
 
 -- Função do Fast Rebirth
 local function startFastRebirth()
@@ -139,23 +138,10 @@ local function startFastRebirth()
     end)
 end
 
--- Atualiza o texto do checkbox
-local function updateCheckbox()
-    if fastRebirth then
-        checkboxButton:SetText("✅ Rebirth Super Rápido")
-    else
-        checkboxButton:SetText(" Rebirth Super Rápido")
-    end
-end
-
--- Cria o botão estilo checkbox
-checkboxButton = page:AddButton(" Rebirth Super Rápido", function()
-    fastRebirth = not fastRebirth
-    updateCheckbox()
+-- Switch real para Fast Rebirth
+page:AddSwitch("Fast Rebirth", function(state)
+    fastRebirth = state
     if fastRebirth then
         startFastRebirth()
     end
 end)
-
--- inicia com 
-updateCheckbox()
