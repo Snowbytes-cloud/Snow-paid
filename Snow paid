@@ -51,9 +51,16 @@ local window = library:AddWindow("Snow paid", {
 -- aba principal
 local page = window:AddTab("Main")
 
--- Variável de controle
-local fastRebirth = false
-local fastButton -- referência do botão para poder mudar o texto
+-- Cria o botão dinâmico dentro da aba "Main"
+fastButton = page:AddButton("Ativar Fast Rebirth", function()
+    fastRebirth = not fastRebirth
+    if fastRebirth then
+        fastButton:SetText("Desativar Fast Rebirth")
+        startFastRebirth()
+    else
+        fastButton:SetText("Ativar Fast Rebirth")
+    end
+end)
 
 -- Função que controla o Fast Rebirth
 local function startFastRebirth()
