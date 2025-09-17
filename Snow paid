@@ -1,57 +1,61 @@
---[[ ============================
-   EXEMPLO PRÁTICO DE USO
-=============================== ]]
-task.spawn(function()
-    -- espera a library estar carregada
-    repeat task.wait() until getgenv().library or library
-    local lib = getgenv().library or library
+-- SUEZ UI Library Implementation
+local library = getgenv().library or library -- pega a library já carregada no arquivo
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local startTime = os.time()
+local startRebirths = player:WaitForChild("leaderstats").Rebirths.Value
+local displayName = player.DisplayName
 
-    -- cria uma janela
-    local window = lib:AddWindow("Meu Script", {
-        main_color = Color3.fromRGB(200, 100, 100),
-        min_size = Vector2.new(400, 300),
-        toggle_key = Enum.KeyCode.RightShift,
-        can_resize = true
-    })
+-- Cria janela principal
+local window = library:AddWindow("Meu Script", {
+    main_color = Color3.fromRGB(200, 100, 100),
+    min_size = Vector2.new(400, 300),
+    toggle_key = Enum.KeyCode.RightShift,
+    can_resize = true
+})
 
-    -- adiciona uma aba
-    local aba1 = window:AddTab("Principal")
+-- Aba principal
+local aba1 = window:AddTab("Principal")
 
-    -- botão
-    aba1:AddButton("Ativar algo", function()
-        print("Botão clicado!")
-    end)
-
-    -- switch
-    local switch, switch_obj = aba1:AddSwitch("GodMode", function(state)
-        print("GodMode:", state)
-    end)
-
-    -- slider
-    local slider, slider_obj = aba1:AddSlider("Velocidade", function(value)
-        print("Velocidade =", value)
-    end, {min = 16, max = 200})
-
-    -- dropdown
-    local drop, drop_obj = aba1:AddDropdown("Escolha algo", function(choice)
-        print("Escolheu:", choice)
-    end)
-    drop:Add("Opção 1")
-    drop:Add("Opção 2")
-    drop:Add("Opção 3")
-
-    -- textbox
-    aba1:AddTextBox("Digite algo", function(text)
-        print("Você digitou:", text)
-    end)
-
-    -- keybind
-    aba1:AddKeybind("Keybind Teste", function(key)
-        print("Você apertou:", key.Name)
-    end, {standard = Enum.KeyCode.K})
-
-    -- color picker
-    aba1:AddColorPicker(function(color)
-        print("Nova cor:", color)
-    end)
+-- Botão
+aba1:AddButton("Ativar algo", function()
+    print("Botão clicado!")
 end)
+
+-- Switch
+local switch, switch_obj = aba1:AddSwitch("GodMode", function(state)
+    print("GodMode:", state)
+end)
+
+-- Slider
+local slider, slider_obj = aba1:AddSlider("Velocidade", function(value)
+    print("Velocidade =", value)
+end, {min = 16, max = 200})
+
+-- Dropdown
+local drop, drop_obj = aba1:AddDropdown("Escolha algo", function(choice)
+    print("Escolheu:", choice)
+end)
+drop:Add("Opção 1")
+drop:Add("Opção 2")
+drop:Add("Opção 3")
+
+-- TextBox
+aba1:AddTextBox("Digite algo", function(text)
+    print("Você digitou:", text)
+end)
+
+-- Keybind
+aba1:AddKeybind("Keybind Teste", function(key)
+    print("Você apertou:", key.Name)
+end, {standard = Enum.KeyCode.K})
+
+-- Color Picker
+aba1:AddColorPicker(function(color)
+    print("Nova cor:", color)
+end)
+
+-- Exemplo de info inicial
+print("Script iniciado por:", displayName)
+print("Rebirths atuais:", startRebirths)
