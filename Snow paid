@@ -39,9 +39,9 @@ local leaderstats = player:WaitForChild("leaderstats", 5)
 local startRebirths = leaderstats and leaderstats:FindFirstChild("Rebirths") and leaderstats.Rebirths.Value or 0
 local displayName = player.DisplayName
 
--- cria a janela
+-- cria a janela (azul escuro)
 local window = library:AddWindow("Snow paid", {
-    main_color = Color3.fromRGB(0, 255, 255), -- ciano
+    main_color = Color3.fromRGB(25, 25, 112), -- azul escuro (Midnight Blue)
     min_size   = Vector2.new(660, 660),
     can_resize = false
 })
@@ -49,9 +49,8 @@ local window = library:AddWindow("Snow paid", {
 -- aba principal
 local page = window:AddTab("Main")
 
--- Variáveis
+-- Variável de controle
 local fastRebirth = false
-local fastRebirthBtn
 
 -- Função que controla o Fast Rebirth
 local function startFastRebirth()
@@ -141,14 +140,13 @@ local function startFastRebirth()
     end)
 end
 
--- Cria o checkbox com emoji
-fastRebirthBtn = page:AddButton("☐ Rebirth Super Rápido", function()
-    fastRebirth = not fastRebirth
-
+-- Cria o checkbox com emoji (☐ / ✅)
+page:AddSwitch("☐ Rebirth Super Rápido", function(state)
+    fastRebirth = state
     if fastRebirth then
-        fastRebirthBtn:SetText("✅ Rebirth Super Rápido")
+        page:UpdateSwitch("☐ Rebirth Super Rápido", "✅ Rebirth Super Rápido", true)
         startFastRebirth()
     else
-        fastRebirthBtn:SetText("☐ Rebirth Super Rápido")
+        page:UpdateSwitch("✅ Rebirth Super Rápido", "☐ Rebirth Super Rápido", false)
     end
 end)
