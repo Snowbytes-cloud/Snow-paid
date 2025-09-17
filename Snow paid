@@ -25,7 +25,7 @@ for _, name in ipairs(whitelist) do
 end
 
 if not allowed then
-    Player:Kick("Você não está autorizado para Usar esse Script compra ou pessa ao dono.")
+    Player:Kick("Você não está autorizado para Usar esse Script compra ou peça ao dono.")
     return
 end
 
@@ -34,9 +34,7 @@ end
 -- Carrega a ZS-LIB
 local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/556ii/ZS-LIB/refs/heads/main/SUEZ", true))()
 
-local Players = game:GetService("Players")
 local player = Players.LocalPlayer
-
 local leaderstats = player:WaitForChild("leaderstats", 5)
 local startRebirths = leaderstats and leaderstats:FindFirstChild("Rebirths") and leaderstats.Rebirths.Value or 0
 local displayName = player.DisplayName
@@ -51,16 +49,9 @@ local window = library:AddWindow("Snow paid", {
 -- aba principal
 local page = window:AddTab("Main")
 
--- Cria o botão dinâmico dentro da aba "Main"
-fastButton = page:AddButton("Ativar Fast Rebirth", function()
-    fastRebirth = not fastRebirth
-    if fastRebirth then
-        fastButton:SetText("Desativar Fast Rebirth")
-        startFastRebirth()
-    else
-        fastButton:SetText("Ativar Fast Rebirth")
-    end
-end)
+-- Variável de controle
+local fastRebirth = false
+local fastButton -- referência do botão para poder mudar o texto
 
 -- Função que controla o Fast Rebirth
 local function startFastRebirth()
@@ -150,8 +141,8 @@ local function startFastRebirth()
     end)
 end
 
--- Cria o botão dinâmico
-fastButton = RebirthTab:AddButton("Ativar Fast Rebirth", function()
+-- Cria o botão dinâmico dentro da aba "Main"
+fastButton = page:AddButton("Ativar Fast Rebirth", function()
     fastRebirth = not fastRebirth
     if fastRebirth then
         fastButton:SetText("Desativar Fast Rebirth")
@@ -160,4 +151,3 @@ fastButton = RebirthTab:AddButton("Ativar Fast Rebirth", function()
         fastButton:SetText("Ativar Fast Rebirth")
     end
 end)
-
