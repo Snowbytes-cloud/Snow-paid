@@ -68,13 +68,6 @@ end
 -- Initialize Anti-AFK system
 setupAntiAFK()
 
--- Create Main Window
-local window = library:AddWindow("Zenith hub", {
-	main_color = Color3.fromRGB(0, 0, 0),
-	min_size = Vector2.new(500, 500),
-	can_resize = true,
-})
-
 -- Main Tab
 local mainTab = window:AddTab("Main")
 local farmPlusTab = window:AddTab("Farm")
