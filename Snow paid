@@ -2314,7 +2314,7 @@ local speedGrind = rebirthFarmFolder:AddSwitch("Fast Strength / pack", function(
 end)
 
 -- 🚀 Fast Rebirth (itsbleedingyz)
-rebirthFarmFolder:AddSwitch("Fast Rebirth / pack", function(bool)
+rebirthFarmFolder:AddSwitch("Fast Rebirth the Fast Strength / pack", function(bool)
 	fastRebirth = bool
 	if fastRebirth then
 		task.spawn(function()
@@ -3130,16 +3130,16 @@ teleportTab:AddButton("Brawl Regular", function()
 	})
 end)
 
-local noteTab = window:AddTab("Note")
+local noteTab = window:AddTab("Info")
 
 -- Título principal
-noteTab:AddLabel("Zenith Store Script")
+noteTab:AddLabel("Snow paid")
 
 -- Espaço
 noteTab:AddLabel("")
 
 -- Créditos
-noteTab:AddLabel("Criado por snowZn")
+noteTab:AddLabel("Criado por snow")
 
 -- Espaço
 noteTab:AddLabel("")
@@ -3154,3 +3154,18 @@ noteTab:AddButton("Entrar no Discord", function()
 		Duration = 5
 	})
 end)
+
+-- Espaço
+noteTab:AddLabel("")
+
+-- Botão do YouTube
+noteTab:AddLabel("📺 Meu Canal no YouTube:")
+noteTab:AddButton("Acessar YouTube", function()
+	setclipboard("https://youtube.com/@snowsplezz?si=nEjKRgSVzC3T03Ya") -- << coloque o link do seu canal
+	game:GetService("StarterGui"):SetCore("SendNotification", {
+		Title = "Zenith Store",
+		Text = "Link do YouTube copiado! Cole no navegador para acessar meu canal.",
+		Duration = 5
+	})
+end)
+
