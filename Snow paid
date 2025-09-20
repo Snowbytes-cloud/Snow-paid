@@ -2246,29 +2246,100 @@ eggFarmFolder:AddLabel("Funções de Egg Farm (By SnowZN)")
 
 local selectedPlayer = nil -- começa sem player
 
--- quando atualizar stats:
-local function getStatValue(player, statName)
-    if not player then return 0 end
+--// Serviços
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+--// Aba Stats
+local statsTab = window:AddTab("Stats")
+
+-- Dropdown no topo
+local selectedPlayer = nil
+local playerDropdown = statsTab:AddDropdown("Selecionar Player", {}, function(value)
+    selectedPlayer = Players:FindFirstChild(value)
+    resetTracking()
+end)
+
+-- Atualiza lista de players no dropdown
+local function updatePlayerList()
+    local names = {}
+    for _, p in ipairs(Players:GetPlayers()) do
+        table.insert(names, p.Name)
+    end
+    if playerDropdown.Refresh then
+        playerDropdown:Refresh(names, selectedPlayer and selectedPlayer.Name or nil)
+    elseif playerDropdown.SetOptions then
+        playerDropdown:SetOptions(names)
+    end
+end
+updatePlayerList()
+Players.PlayerAdded:Connect(updatePlayerList)
+Players.PlayerRemoving:Connect(updatePlayerList)
+
+-- Folder de estatísticas
+local statsFolder = statsTab:AddFolder("Estatísticas")
+
+statsFolder:AddLabel("Strength")
+local strengthStatsLabel = statsFolder:AddLabel("Actual: 0 | Gained: 0 | Per Hour: 0 | Per Day: 0")
+
+statsFolder:AddLabel("Durability")
+local durabilityStatsLabel = statsFolder:AddLabel("Actual: 0 | Gained: 0 | Per Hour: 0 | Per Day: 0")
+
+statsFolder:AddLabel("Rebirths")
+local rebirthsStatsLabel = statsFolder:AddLabel("Actual: 0 | Gained: 0 | Per Hour: 0 | Per Day: 0")
+
+statsFolder:AddLabel("Kills")
+local killsStatsLabel = statsFolder:AddLabel("Actual: 0 | Gained: 0 | Per Hour: 0 | Per Day: 0")
+
+statsFolder:AddLabel("Brawls")
+local brawlsStatsLabel = statsFolder:AddLabel("Actual: 0 | Gained: 0 | Per Hour: 0 | Per Day: 0")
+
+statsFolder:AddLabel("Time Of Session")
+local sessionTimeLabel = statsFolder:AddLabel("Time: 00:00:00")
+
+-- Função segura para pegar stats
+local function getStatValue(plr, statName)
+    if not plr then return 0 end
     local val = 0
-    if player:FindFirstChild("leaderstats") and player.leaderstats:FindFirstChild(statName) then
-        val = player.leaderstats[statName].Value
-    elseif player:FindFirstChild(statName) then
-        val = player[statName].Value
+    if plr:FindFirstChild("leaderstats") and plr.leaderstats:FindFirstChild(statName) then
+        val = plr.leaderstats[statName].Value
+    elseif plr:FindFirstChild(statName) then
+        val = plr[statName].Value
     end
     return tonumber(val) or 0
 end
 
--- no updateStats()
-if not selectedPlayer then
-    -- força tudo a 0
-    setLabelText(strengthStatsLabel, "Actual: 0 | Gained: 0 | Per Hour: 0 | Per Day: 0")
-    setLabelText(durabilityStatsLabel, "Actual: 0 | Gained: 0 | Per Hour: 0 | Per Day: 0")
-    setLabelText(rebirthsStatsLabel, "Actual: 0 | Gained: 0 | Per Hour: 0 | Per Day: 0")
-    setLabelText(killsStatsLabel, "Actual: 0 | Gained: 0 | Per Hour: 0 | Per Day: 0")
-    setLabelText(brawlsStatsLabel, "Actual: 0 | Gained: 0 | Per Hour: 0 | Per Day: 0")
-    setLabelText(sessionTimeLabel, "Time: 00:00:00")
-    return
+-- Atualização dos stats
+local function updateStats()
+    if not selectedPlayer then
+        strengthStatsLabel:Set("Actual: 0 | Gained: 0 | Per Hour: 0 | Per Day: 0")
+        durabilityStatsLabel:Set("Actual: 0 | Gained: 0 | Per Hour: 0 | Per Day: 0")
+        rebirthsStatsLabel:Set("Actual: 0 | Gained: 0 | Per Hour: 0 | Per Day: 0")
+        killsStatsLabel:Set("Actual: 0 | Gained: 0 | Per Hour: 0 | Per Day: 0")
+        brawlsStatsLabel:Set("Actual: 0 | Gained: 0 | Per Hour: 0 | Per Day: 0")
+        sessionTimeLabel:Set("Time: 00:00:00")
+        return
+    end
+
+    local strength = getStatValue(selectedPlayer, "Strength")
+    local durability = getStatValue(selectedPlayer, "Durability")
+    local rebirths = getStatValue(selectedPlayer, "Rebirths")
+    local kills = getStatValue(selectedPlayer, "Kills")
+    local brawls = getStatValue(selectedPlayer, "Brawls")
+
+    strengthStatsLabel:Set(("Actual: %s | Gained: 0 | Per Hour: 0 | Per Day: 0"):format(strength))
+    durabilityStatsLabel:Set(("Actual: %s | Gained: 0 | Per Hour: 0 | Per Day: 0"):format(durability))
+    rebirthsStatsLabel:Set(("Actual: %s | Gained: 0 | Per Hour: 0 | Per Day: 0"):format(rebirths))
+    killsStatsLabel:Set(("Actual: %s | Gained: 0 | Per Hour: 0 | Per Day: 0"):format(kills))
+    brawlsStatsLabel:Set(("Actual: %s | Gained: 0 | Per Hour: 0 | Per Day: 0"):format(brawls))
 end
+
+-- Loop para atualizar sempre
+task.spawn(function()
+    while task.wait(1) do
+        pcall(updateStats)
+    end
+end)
 
 local pets = window:AddTab("Pets")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
