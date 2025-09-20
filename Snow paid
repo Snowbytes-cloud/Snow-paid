@@ -2340,8 +2340,6 @@ spawn(function()
     end
 end)
 
-
-
 local pets = window:AddTab("Pets")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
