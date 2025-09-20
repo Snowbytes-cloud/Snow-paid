@@ -2244,6 +2244,15 @@ end)
 
 eggFarmFolder:AddLabel("Funções de Egg Farm (By SnowZN)")
 
+-- Inicializar variables de seguimiento
+local sessionStartTime = os.time()
+local sessionStartStrength = 0
+local sessionStartDurability = 0
+local sessionStartKills = 0
+local sessionStartRebirths = 0
+local sessionStartBrawls = 0
+local hasStartedTracking = false
+
 local statsFolder = farmPlusTab:AddFolder("Stats")
 
 statsFolder:AddLabel("Strength")
@@ -2476,6 +2485,8 @@ local function formatNumberWithCommas(number)
 	end
 	return formatted
 end
+
+
 
 local pets = window:AddTab("Pets")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
