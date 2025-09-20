@@ -2244,11 +2244,7 @@ end)
 
 eggFarmFolder:AddLabel("Funções de Egg Farm (By SnowZN)")
 
--- Cria uma nova aba chamada "Stats"
-local statsTab = window:AddTab("Stats")
-
--- Cria a folder principal dentro da aba
-local statsFolder = statsTab:AddFolder("Estatísticas")
+local statsFolder = farmPlusTab:AddFolder("Stats")
 
 statsFolder:AddLabel("Strength")
 local strengthStatsLabel = statsFolder:AddLabel("Actual: Waiting... | Gained: 0 | Per Hour: 0 | Per Day: 0")
@@ -2480,6 +2476,7 @@ local function formatNumberWithCommas(number)
 	end
 	return formatted
 end
+
 
 local pets = window:AddTab("Pets")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
