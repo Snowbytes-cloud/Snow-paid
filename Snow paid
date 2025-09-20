@@ -2246,12 +2246,11 @@ eggFarmFolder:AddLabel("Funções de Egg Farm (By SnowZN)")
 
 -- Cria uma nova aba chamada "Stats"
 local statsTab = window:AddTab("Stats")
-local statsFolder = statsTab:AddFolder("Estatísticas")
 
--- Dropdown para escolher o player
+-- Dropdown no topo para selecionar o player
 local Players = game:GetService("Players")
 local selectedPlayer = Players.LocalPlayer
-local playerDropdown = statsFolder:AddDropdown("Selecionar Player", {}, function(value)
+local playerDropdown = statsTab:AddDropdown("Selecionar Player", {}, function(value)
 	selectedPlayer = Players:FindFirstChild(value) or Players.LocalPlayer
 	resetTracking()
 end)
@@ -2268,6 +2267,9 @@ updatePlayerList()
 
 Players.PlayerAdded:Connect(updatePlayerList)
 Players.PlayerRemoving:Connect(updatePlayerList)
+
+-- Cria a folder para estatísticas logo abaixo
+local statsFolder = statsTab:AddFolder("Estatísticas")
 
 -- Labels de estatísticas
 statsFolder:AddLabel("Strength")
@@ -2287,174 +2289,154 @@ local brawlsStatsLabel = statsFolder:AddLabel("Actual: Waiting... | Gained: 0 | 
 
 statsFolder:AddLabel("Time Of Session")
 local sessionTimeLabel = statsFolder:AddLabel("Time: 00:00:00")
+-- Cria a aba Stats
+local statsTab = window:AddTab("Stats")
 
--- Formatadores
-local function formatNumber(number)
-	if number >= 1e15 then return string.format("%.2fQ", number/1e15)
-	elseif number >= 1e12 then return string.format("%.2fT", number/1e12)
-	elseif number >= 1e9 then return string.format("%.2fB", number/1e9)
-	elseif number >= 1e6 then return string.format("%.2fM", number/1e6)
-	elseif number >= 1e3 then return string.format("%.2fK", number/1e3)
+local Players = game:GetService("Players")
+local selectedPlayer = Players.LocalPlayer
+
+-- Dropdown no topo para escolher player
+local playerDropdown = statsTab:AddDropdown("Selecionar Player", {}, function(value)
+	selectedPlayer = Players:FindFirstChild(value) or Players.LocalPlayer
+	resetTracking()
+end)
+
+-- Atualiza a lista de players no dropdown
+local function updatePlayerList()
+	local names = {}
+	for _, p in ipairs(Players:GetPlayers()) do
+		table.insert(names, p.Name)
 	end
-	return tostring(math.floor(number))
+	playerDropdown:Refresh(names, selectedPlayer and selectedPlayer.Name)
 end
 
-local function formatTime(seconds)
-	local days = math.floor(seconds / 86400)
-	local hours = math.floor((seconds % 86400) / 3600)
-	local minutes = math.floor((seconds % 3600) / 60)
-	local secs = seconds % 60
-	if days > 0 then
-		return string.format("%dd %02dh %02dm %02ds", days, hours, minutes, secs)
+Players.PlayerAdded:Connect(updatePlayerList)
+Players.PlayerRemoving:Connect(updatePlayerList)
+updatePlayerList()
+
+-- Folder de estatísticas
+local statsFolder = statsTab:AddFolder("Estatísticas")
+
+statsFolder:AddLabel("Strength")
+local strengthStatsLabel = statsFolder:AddLabel("Actual: Waiting... | Gained: 0 | Per Hour: 0 | Per Day: 0")
+
+statsFolder:AddLabel("Durability")
+local durabilityStatsLabel = statsFolder:AddLabel("Actual: Waiting... | Gained: 0 | Per Hour: 0 | Per Day: 0")
+
+statsFolder:AddLabel("Rebirths")
+local rebirthsStatsLabel = statsFolder:AddLabel("Actual: Waiting... | Gained: 0 | Per Hour: 0 | Per Day: 0")
+
+statsFolder:AddLabel("Kills")
+local killsStatsLabel = statsFolder:AddLabel("Actual: Waiting... | Gained: 0 | Per Hour: 0 | Per Day: 0")
+
+statsFolder:AddLabel("Brawls")
+local brawlsStatsLabel = statsFolder:AddLabel("Actual: Waiting... | Gained: 0 | Per Hour: 0 | Per Day: 0")
+
+statsFolder:AddLabel("Time Of Session")
+local sessionTimeLabel = statsFolder:AddLabel("Time: 00:00:00")
+
+-- Variáveis para tracking
+local startTime = tick()
+local initialStats = {}
+local sessionActive = true
+
+local function formatNumber(num)
+	if num >= 1e9 then
+		return string.format("%.2fB", num / 1e9)
+	elseif num >= 1e6 then
+		return string.format("%.2fM", num / 1e6)
+	elseif num >= 1e3 then
+		return string.format("%.2fK", num / 1e3)
 	else
-		return string.format("%02d:%02d:%02d", hours, minutes, secs)
+		return tostring(num)
 	end
 end
 
--- Variáveis de tracking
-local smoothingFactor = 0.2
-local smoothedRates = {}
-local sessionStartStrength, sessionStartDurability, sessionStartKills, sessionStartRebirths, sessionStartBrawls, sessionStartTime
-local hasStartedTracking = false
-
--- Funções auxiliares
-local function calculateRate(gain, elapsed)
-	if elapsed <= 0 then return 0, 0 end
-	local perHour = gain / (elapsed / 3600)
-	local perDay = gain / (elapsed / 86400)
-	return perHour, perDay
-end
-
-local function smoothValue(oldValue, newValue)
-	return oldValue * (1 - smoothingFactor) + newValue * smoothingFactor
-end
-
+-- Reset tracking
 function resetTracking()
 	if selectedPlayer and selectedPlayer:FindFirstChild("leaderstats") then
-		sessionStartStrength = selectedPlayer.leaderstats.Strength.Value
-		sessionStartDurability = selectedPlayer.Durability.Value
-		sessionStartKills = selectedPlayer.leaderstats.Kills.Value
-		sessionStartRebirths = selectedPlayer.leaderstats.Rebirths.Value
-		sessionStartBrawls = selectedPlayer.leaderstats.Brawls.Value
-		sessionStartTime = os.time()
-		hasStartedTracking = true
-
-		smoothedRates = {
-			strengthHour = 0, strengthDay = 0,
-			durabilityHour = 0, durabilityDay = 0,
-			killsHour = 0, killsDay = 0,
-			rebirthsHour = 0, rebirthsDay = 0,
-			brawlsHour = 0, brawlsDay = 0,
+		initialStats = {
+			Strength = selectedPlayer.leaderstats:FindFirstChild("Strength") and selectedPlayer.leaderstats.Strength.Value or 0,
+			Durability = selectedPlayer.leaderstats:FindFirstChild("Durability") and selectedPlayer.leaderstats.Durability.Value or 0,
+			Rebirths = selectedPlayer.leaderstats:FindFirstChild("Rebirths") and selectedPlayer.leaderstats.Rebirths.Value or 0,
+			Kills = selectedPlayer.leaderstats:FindFirstChild("Kills") and selectedPlayer.leaderstats.Kills.Value or 0,
+			Brawls = selectedPlayer.leaderstats:FindFirstChild("Brawls") and selectedPlayer.leaderstats.Brawls.Value or 0
 		}
+		startTime = tick()
 	end
 end
+resetTracking()
 
--- Update das estatísticas
+-- Atualiza estatísticas
 local function updateStats()
-	if not selectedPlayer or not selectedPlayer:FindFirstChild("leaderstats") then return end
-	if not hasStartedTracking then resetTracking() end
+	if not sessionActive or not selectedPlayer or not selectedPlayer:FindFirstChild("leaderstats") then return end
 
-	local currentStrength = selectedPlayer.leaderstats.Strength.Value
-	local currentDurability = selectedPlayer.Durability.Value
-	local currentKills = selectedPlayer.leaderstats.Kills.Value
-	local currentRebirths = selectedPlayer.leaderstats.Rebirths.Value
-	local currentBrawls = selectedPlayer.leaderstats.Brawls.Value
+	local currentStats = {
+		Strength = selectedPlayer.leaderstats:FindFirstChild("Strength") and selectedPlayer.leaderstats.Strength.Value or 0,
+		Durability = selectedPlayer.leaderstats:FindFirstChild("Durability") and selectedPlayer.leaderstats.Durability.Value or 0,
+		Rebirths = selectedPlayer.leaderstats:FindFirstChild("Rebirths") and selectedPlayer.leaderstats.Rebirths.Value or 0,
+		Kills = selectedPlayer.leaderstats:FindFirstChild("Kills") and selectedPlayer.leaderstats.Kills.Value or 0,
+		Brawls = selectedPlayer.leaderstats:FindFirstChild("Brawls") and selectedPlayer.leaderstats.Brawls.Value or 0
+	}
 
-	local strengthGain = currentStrength - sessionStartStrength
-	local durabilityGain = currentDurability - sessionStartDurability
-	local killsGain = currentKills - sessionStartKills
-	local rebirthsGain = currentRebirths - sessionStartRebirths
-	local brawlsGain = currentBrawls - sessionStartBrawls
+	local elapsedTime = tick() - startTime
+	local hours = elapsedTime / 3600
+	local days = elapsedTime / 86400
 
-	local elapsedTime = os.time() - sessionStartTime
+	strengthStatsLabel:Set("Actual: " .. formatNumber(currentStats.Strength) ..
+		" | Gained: " .. formatNumber(currentStats.Strength - initialStats.Strength) ..
+		" | Per Hour: " .. formatNumber((currentStats.Strength - initialStats.Strength) / math.max(hours, 1/3600)) ..
+		" | Per Day: " .. formatNumber((currentStats.Strength - initialStats.Strength) / math.max(days, 1/86400)))
 
-	local strengthHour, strengthDay = calculateRate(strengthGain, elapsedTime)
-	local durabilityHour, durabilityDay = calculateRate(durabilityGain, elapsedTime)
-	local killsHour, killsDay = calculateRate(killsGain, elapsedTime)
-	local rebirthsHour, rebirthsDay = calculateRate(rebirthsGain, elapsedTime)
-	local brawlsHour, brawlsDay = calculateRate(brawlsGain, elapsedTime)
+	durabilityStatsLabel:Set("Actual: " .. formatNumber(currentStats.Durability) ..
+		" | Gained: " .. formatNumber(currentStats.Durability - initialStats.Durability) ..
+		" | Per Hour: " .. formatNumber((currentStats.Durability - initialStats.Durability) / math.max(hours, 1/3600)) ..
+		" | Per Day: " .. formatNumber((currentStats.Durability - initialStats.Durability) / math.max(days, 1/86400)))
 
-	smoothedRates.strengthHour = smoothValue(smoothedRates.strengthHour, strengthHour)
-	smoothedRates.strengthDay = smoothValue(smoothedRates.strengthDay, strengthDay)
-	smoothedRates.durabilityHour = smoothValue(smoothedRates.durabilityHour, durabilityHour)
-	smoothedRates.durabilityDay = smoothValue(smoothedRates.durabilityDay, durabilityDay)
-	smoothedRates.killsHour = smoothValue(smoothedRates.killsHour, killsHour)
-	smoothedRates.killsDay = smoothValue(smoothedRates.killsDay, killsDay)
-	smoothedRates.rebirthsHour = smoothValue(smoothedRates.rebirthsHour, rebirthsHour)
-	smoothedRates.rebirthsDay = smoothValue(smoothedRates.rebirthsDay, rebirthsDay)
-	smoothedRates.brawlsHour = smoothValue(smoothedRates.brawlsHour, brawlsHour)
-	smoothedRates.brawlsDay = smoothValue(smoothedRates.brawlsDay, brawlsDay)
+	rebirthsStatsLabel:Set("Actual: " .. formatNumber(currentStats.Rebirths) ..
+		" | Gained: " .. formatNumber(currentStats.Rebirths - initialStats.Rebirths) ..
+		" | Per Hour: " .. formatNumber((currentStats.Rebirths - initialStats.Rebirths) / math.max(hours, 1/3600)) ..
+		" | Per Day: " .. formatNumber((currentStats.Rebirths - initialStats.Rebirths) / math.max(days, 1/86400)))
 
-	strengthStatsLabel.Text = string.format("Actual: %s | Gained: %s | Per Hour: %s | Per Day: %s",
-		formatNumber(currentStrength), formatNumber(strengthGain),
-		formatNumber(smoothedRates.strengthHour), formatNumber(smoothedRates.strengthDay))
+	killsStatsLabel:Set("Actual: " .. formatNumber(currentStats.Kills) ..
+		" | Gained: " .. formatNumber(currentStats.Kills - initialStats.Kills) ..
+		" | Per Hour: " .. formatNumber((currentStats.Kills - initialStats.Kills) / math.max(hours, 1/3600)) ..
+		" | Per Day: " .. formatNumber((currentStats.Kills - initialStats.Kills) / math.max(days, 1/86400)))
 
-	durabilityStatsLabel.Text = string.format("Actual: %s | Gained: %s | Per Hour: %s | Per Day: %s",
-		formatNumber(currentDurability), formatNumber(durabilityGain),
-		formatNumber(smoothedRates.durabilityHour), formatNumber(smoothedRates.durabilityDay))
+	brawlsStatsLabel:Set("Actual: " .. formatNumber(currentStats.Brawls) ..
+		" | Gained: " .. formatNumber(currentStats.Brawls - initialStats.Brawls) ..
+		" | Per Hour: " .. formatNumber((currentStats.Brawls - initialStats.Brawls) / math.max(hours, 1/3600)) ..
+		" | Per Day: " .. formatNumber((currentStats.Brawls - initialStats.Brawls) / math.max(days, 1/86400)))
 
-	rebirthsStatsLabel.Text = string.format("Actual: %s | Gained: %s | Per Hour: %s | Per Day: %s",
-		formatNumber(currentRebirths), formatNumber(rebirthsGain),
-		formatNumber(smoothedRates.rebirthsHour), formatNumber(smoothedRates.rebirthsDay))
-
-	killsStatsLabel.Text = string.format("Actual: %s | Gained: %s | Per Hour: %s | Per Day: %s",
-		formatNumber(currentKills), formatNumber(killsGain),
-		formatNumber(smoothedRates.killsHour), formatNumber(smoothedRates.killsDay))
-
-	brawlsStatsLabel.Text = string.format("Actual: %s | Gained: %s | Per Hour: %s | Per Day: %s",
-		formatNumber(currentBrawls), formatNumber(brawlsGain),
-		formatNumber(smoothedRates.brawlsHour), formatNumber(smoothedRates.brawlsDay))
-
-	sessionTimeLabel.Text = string.format("Time: %s", formatTime(elapsedTime))
+	local seconds = math.floor(elapsedTime % 60)
+	local minutes = math.floor((elapsedTime / 60) % 60)
+	local hrs = math.floor((elapsedTime / 3600) % 24)
+	local daysPassed = math.floor(elapsedTime / 86400)
+	sessionTimeLabel:Set(string.format("Time: %02d:%02d:%02d (Days: %d)", hrs, minutes, seconds, daysPassed))
 end
 
+-- Loop de atualização
 spawn(function()
-	while wait(2) do
+	while wait(1) do
 		updateStats()
 	end
 end)
 
--- Botão reset
-statsFolder:AddButton("Reset Stats", function()
+-- Botões extras
+statsTab:AddButton("Reset Stats Tracking", function()
 	resetTracking()
-	game:GetService("StarterGui"):SetCore("SendNotification", {
-		Title = "Estatísticas",
-		Text = "Progresso de estatísticas reiniciado para " .. (selectedPlayer and selectedPlayer.Name or "N/A"),
-		Duration = 5
-	})
 end)
 
--- Botão copiar
-statsFolder:AddButton("Copiar Estatísticas", function()
-	if not selectedPlayer or not selectedPlayer:FindFirstChild("leaderstats") then return end
-	local statsText = "Estatísticas de " .. selectedPlayer.Name .. ":\n\n"
-
-	statsText = statsText .. "Strength: " .. tostring(selectedPlayer.leaderstats.Strength.Value) .. "\n"
-	statsText = statsText .. "Durability: " .. tostring(selectedPlayer.Durability.Value) .. "\n"
-	statsText = statsText .. "Rebirths: " .. tostring(selectedPlayer.leaderstats.Rebirths.Value) .. "\n"
-	statsText = statsText .. "Kills: " .. tostring(selectedPlayer.leaderstats.Kills.Value) .. "\n"
-	statsText = statsText .. "Brawls: " .. tostring(selectedPlayer.leaderstats.Brawls.Value) .. "\n\n"
-
-	if hasStartedTracking then
-		local elapsedTime = os.time() - sessionStartTime
-		statsText = statsText .. "--- Sessão ---\n"
-		statsText = statsText .. "Time Of Session: " .. formatTime(elapsedTime) .. "\n"
+statsTab:AddButton("Copy Stats To Clipboard", function()
+	if selectedPlayer and selectedPlayer:FindFirstChild("leaderstats") then
+		local statsText = "📊 Stats for " .. selectedPlayer.Name .. ":\n"
+		for _, stat in ipairs({"Strength", "Durability", "Rebirths", "Kills", "Brawls"}) do
+			if selectedPlayer.leaderstats:FindFirstChild(stat) then
+				statsText = statsText .. stat .. ": " .. tostring(selectedPlayer.leaderstats[stat].Value) .. "\n"
+			end
+		end
+		setclipboard(statsText)
 	end
-
-	setclipboard(statsText)
-end)
-
-local pets = window:AddTab("Pets")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
--- Pet section
-pets:AddLabel("Pets")
-
--- Create pet dropdown with the correct format
-local selectedPet = "Neon Guardian" -- Default selection
-local petDropdown = pets:AddDropdown("Selecionar Pet", function(text)
-	selectedPet = text
-	print("Pet selecionado: " .. text)
 end)
 
 -- Add pet options
