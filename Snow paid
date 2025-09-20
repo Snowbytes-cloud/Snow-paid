@@ -1198,7 +1198,7 @@ local sessionStartBrawls = 0
 local hasStartedTracking = false
 
 -- Create the Misc tab
-local miscTab = window:AddTab("Misc")
+local miscTab = window:AddTab("Fast farm")
 
 -- Create the first folder
 local misc1Folder = miscTab:AddFolder("Misc 1")
@@ -2243,6 +2243,7 @@ eggFarmFolder:AddButton("Comer 1 Ovo", function()
 end)
 
 eggFarmFolder:AddLabel("Funções de Egg Farm (By SnowZN)")
+
 
 -- Inicializar variables de seguimiento
 local sessionStartTime = os.time()
