@@ -2248,15 +2248,21 @@ eggFarmFolder:AddLabel("Funções de Egg Farm (By SnowZN)")
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 
---========================
--- CRIA NOVA ABA SEPARADA
---========================
+--=====================================================
+-- CRIA SUAS OUTRAS ABAS (Farm, Note, etc. do seu script)
+--=====================================================
+
+-- Exemplo (mantenha as que já existem no seu script):
+local farmPlusTab = window:AddTab("Farm")
+local noteTab = window:AddTab("Note")
+
+--=====================================================
+-- NOVA ABA STATS (NÃO APAGA AS OUTRAS)
+--=====================================================
 local statsTab = window:AddTab("Stats")
 local statsFolder = statsTab:AddFolder("Estatísticas")
 
---========================
--- DROPDOWN DE PLAYERS
---========================
+-- Dropdown para selecionar player
 local selectedPlayer = nil
 local playerDropdown = statsTab:AddDropdown("Selecionar Player", {}, function(value)
     selectedPlayer = Players:FindFirstChild(value)
@@ -2279,9 +2285,7 @@ updatePlayerList()
 Players.PlayerAdded:Connect(updatePlayerList)
 Players.PlayerRemoving:Connect(updatePlayerList)
 
---========================
--- LABELS DE ESTATÍSTICAS
---========================
+-- Labels de estatísticas
 statsFolder:AddLabel("Strength")
 local strengthStatsLabel = statsFolder:AddLabel("Actual: 0 | Gained: 0 | Per Hour: 0 | Per Day: 0")
 
@@ -2300,9 +2304,7 @@ local brawlsStatsLabel = statsFolder:AddLabel("Actual: 0 | Gained: 0 | Per Hour:
 statsFolder:AddLabel("Time Of Session")
 local sessionTimeLabel = statsFolder:AddLabel("Time: 00:00:00")
 
---========================
--- FUNÇÕES AUXILIARES
---========================
+-- Funções auxiliares
 local function getStatValue(plr, statName)
     if not plr then return 0 end
     if plr:FindFirstChild("leaderstats") and plr.leaderstats:FindFirstChild(statName) then
@@ -2337,9 +2339,7 @@ local function formatTime(seconds)
     end
 end
 
---========================
--- TRACKING
---========================
+-- Tracking
 local startTime = tick()
 local initialStats = {}
 
@@ -2356,9 +2356,7 @@ function resetTracking()
     end
 end
 
---========================
--- UPDATE DOS STATS
---========================
+-- Update dos stats
 local function updateStats()
     if not selectedPlayer then
         strengthStatsLabel:Set("Actual: 0 | Gained: 0 | Per Hour: 0 | Per Day: 0")
@@ -2424,9 +2422,7 @@ task.spawn(function()
     end
 end)
 
---========================
--- BOTÕES EXTRAS
---========================
+-- Botões extras
 statsFolder:AddButton("Reset Stats", function()
     resetTracking()
 end)
@@ -2440,6 +2436,7 @@ statsFolder:AddButton("Copiar Estatísticas", function()
     statsText = statsText .. "Tempo de sessão: " .. formatTime(tick() - startTime) .. "\n"
     setclipboard(statsText)
 end)
+
 
 
 local pets = window:AddTab("Pets")
