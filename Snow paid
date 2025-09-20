@@ -2244,11 +2244,6 @@ end)
 
 eggFarmFolder:AddLabel("Funções de Egg Farm (By SnowZN)")
 
-
---// Serviços
-local Players = game:GetService("Players")
-local player = Players.LocalPlayer
-
 --==============================
 -- NOVA ABA SEPARADA "Stats"
 --==============================
@@ -2286,11 +2281,32 @@ local brawlsGainLabel = statsFolder:AddLabel("Gained: 0")
 statsFolder:AddLabel("Time Of Session")
 local sessionTimeLabel = statsFolder:AddLabel("Time: 00:00:00")
 
--- Funções auxiliares
+-- Função auxiliar: formatar tempo
+local function formatTime(seconds)
+    local h = math.floor(seconds / 3600)
+    local m = math.floor((seconds % 3600) / 60)
+    local s = seconds % 60
+    return string.format("%02d:%02d:%02d", h, m, s)
+end
+
+-- Função auxiliar: formatar números (ex: 1.2K, 3.4M)
+local function formatNumber(n)
+    if n >= 1e9 then
+        return string.format("%.1fB", n/1e9)
+    elseif n >= 1e6 then
+        return string.format("%.1fM", n/1e6)
+    elseif n >= 1e3 then
+        return string.format("%.1fK", n/1e3)
+    else
+        return tostring(n)
+    end
+end
+
+-- Iniciar contagem
 local function startTracking()
     if not hasStartedTracking then
         sessionStartStrength = player.leaderstats.Strength.Value
-        sessionStartDurability = player.Durability.Value
+        sessionStartDurability = player.leaderstats.Durability.Value
         sessionStartKills = player.leaderstats.Kills.Value
         sessionStartRebirths = player.leaderstats.Rebirths.Value
         sessionStartBrawls = player.leaderstats.Brawls.Value
@@ -2299,13 +2315,14 @@ local function startTracking()
     end
 end
 
+-- Atualizar
 local function updateStats()
     if not hasStartedTracking then
         startTracking()
     end
     
     local currentStrength = player.leaderstats.Strength.Value
-    local currentDurability = player.Durability.Value
+    local currentDurability = player.leaderstats.Durability.Value
     local currentKills = player.leaderstats.Kills.Value
     local currentRebirths = player.leaderstats.Rebirths.Value
     local currentBrawls = player.leaderstats.Brawls.Value
@@ -2332,10 +2349,9 @@ local function updateStats()
     sessionTimeLabel.Text = string.format("Time: %s", formatTime(elapsedTime))
 end
 
-updateStats()
-
+-- Loop de atualização
 spawn(function()
-    while wait(2) do
+    while task.wait(2) do
         updateStats()
     end
 end)
