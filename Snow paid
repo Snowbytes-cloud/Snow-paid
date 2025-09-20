@@ -2439,6 +2439,19 @@ statsTab:AddButton("Copy Stats To Clipboard", function()
 	end
 end)
 
+local pets = window:AddTab("Pets")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+-- Pet section
+pets:AddLabel("Pets")
+
+-- Create pet dropdown with the correct format
+local selectedPet = "Neon Guardian" -- Default selection
+local petDropdown = pets:AddDropdown("Selecionar Pet", function(text)
+	selectedPet = text
+	print("Pet selecionado: " .. text)
+end)
+
 -- Add pet options
 petDropdown:Add("Neon Guardian")
 petDropdown:Add("Blue Birdie")
