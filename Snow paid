@@ -1198,10 +1198,10 @@ local sessionStartBrawls = 0
 local hasStartedTracking = false
 
 -- Create the Misc tab
-local miscTab = window:AddTab("Fast farm")
+local miscTab = window:AddTab("Misc")
 
 -- Create the first folder
-local misc1Folder = miscTab:AddFolder("misc 1")
+local misc1Folder = miscTab:AddFolder("Misc 1")
 
 -- Add ad removal button to Misc 1
 misc1Folder:AddButton("Remove Portals", function()
@@ -2477,6 +2477,7 @@ local function formatNumberWithCommas(number)
 	return formatted
 end
 
+
 local pets = window:AddTab("Pets")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -2597,6 +2598,7 @@ pets:AddSwitch("Auto Open Auras", function(bool)
 		end)
 	end
 end)
+
 
 local killerTab = window:AddTab("Killer")
 
@@ -3128,7 +3130,7 @@ teleportTab:AddButton("Brawl Regular", function()
 	})
 end)
 
-local noteTab = window:AddTab("Note")
+local noteTab = window:AddTab("Info")
 
 -- Título principal
 noteTab:AddLabel("Snow paid")
@@ -3145,12 +3147,12 @@ noteTab:AddLabel("")
 -- Botão do Discord
 noteTab:AddLabel("🌐 Servidor Oficial do Script!:")
 noteTab:AddButton("Entrar no Discord", function()
-    setclipboard("https://discord.gg/Kw5avTFZ8A") -- copia o link
-    game:GetService("StarterGui"):SetCore("SendNotification", {
-        Title = "Zenith Store",
-        Text = "Link do Discord copiado! Cole no navegador ou no Discord para entrar.",
-        Duration = 5
-    })
+	setclipboard("https://discord.gg/Kw5avTFZ8A") -- copia o link
+	game:GetService("StarterGui"):SetCore("SendNotification", {
+		Title = "Zenith Store",
+		Text = "Link do Discord copiado! Cole no navegador ou no discord para entrar.",
+		Duration = 5
+	})
 end)
 
 -- Espaço
@@ -3159,12 +3161,10 @@ noteTab:AddLabel("")
 -- Botão do YouTube
 noteTab:AddLabel("📺 Meu Canal no YouTube:")
 noteTab:AddButton("Acessar YouTube", function()
-    local canal = "https://youtube.com/@snowsplezz?si=nEjKRgSVzC3T03Ya" -- << coloque o link do seu canal
-    setclipboard(canal)
-
-    game:GetService("StarterGui"):SetCore("SendNotification", {
-        Title = "Snow01",
-        Text = "📺 Link do YouTube copiado! Cole no navegador para abrir o canal.",
-        Duration = 6
-    })
+	setclipboard("https://youtube.com/@snowsplezz?si=nEjKRgSVzC3T03Ya") -- << coloque o link do seu canal
+	game:GetService("StarterGui"):SetCore("SendNotification", {
+		Title = "Zenith Store",
+		Text = "Link do YouTube copiado! Cole no navegador para acessar meu canal.",
+		Duration = 5
+	})
 end)
