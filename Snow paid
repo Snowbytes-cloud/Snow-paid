@@ -1197,7 +1197,11 @@ local sessionStartRebirths = 0
 local sessionStartBrawls = 0
 local hasStartedTracking = false
 
-local statsFolder = farmPlusTab:AddFolder("Stats")
+-- Cria uma nova aba chamada "Stats"
+local statsTab = window:AddTab("Stats")
+
+-- Cria a folder principal dentro da aba
+local statsFolder = statsTab:AddFolder("Estatísticas")
 
 statsFolder:AddLabel("Strength")
 local strengthStatsLabel = statsFolder:AddLabel("Actual: Waiting... | Gained: 0 | Per Hour: 0 | Per Day: 0")
@@ -1554,10 +1558,10 @@ pets:AddSwitch("Auto Open Auras", function(bool)
 end)
 
 -- Create the Misc tab
-local miscTab = window:AddTab("Misc")
+local miscTab = window:AddTab("Fast farm")
 
 -- Create the first folder
-local misc1Folder = miscTab:AddFolder("Misc 1")
+local misc1Folder = miscTab:AddFolder("misc 1")
 
 -- Add ad removal button to Misc 1
 misc1Folder:AddButton("Remove Portals", function()
