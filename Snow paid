@@ -2394,8 +2394,6 @@ statsTab:AddButton("Copy Stats To Clipboard", function()
 	end
 end)
 
-
-
 local pets = window:AddTab("Pets")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
