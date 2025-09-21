@@ -2334,8 +2334,6 @@ spawn(function()
     end
 end)
 
-
-
 -- Aura section
 pets:AddLabel("AURAS")
 
