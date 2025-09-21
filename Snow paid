@@ -2244,8 +2244,17 @@ end)
 
 eggFarmFolder:AddLabel("Funções de Egg Farm (By SnowZN)")
 
+l--==============================
+-- Serviços e Player
+--==============================
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
+
+--==============================
+-- NOVA ABA SEPARADA "Stats"
+--==============================
+local statsTab = window:AddTab("Stats")
+local statsFolder = statsTab:AddFolder("Estatísticas")
 
 local sessionStartTime = os.time()
 local sessionStartStrength = 0
@@ -2254,10 +2263,6 @@ local sessionStartKills = 0
 local sessionStartRebirths = 0
 local sessionStartBrawls = 0
 local hasStartedTracking = false
-
--- quarta aba: Stats
-local statsTab = window:AddTab("Stats")
-local statsFolder = statsTab:AddFolder("Estatísticas")
 
 statsFolder:AddLabel("Strength")
 local strengthStatsLabel = statsFolder:AddLabel("Actual: Waiting...")
@@ -2282,7 +2287,7 @@ local brawlsGainLabel = statsFolder:AddLabel("Gained: 0")
 statsFolder:AddLabel("Time Of Session")
 local sessionTimeLabel = statsFolder:AddLabel("Time: 00:00:00")
 
--- funções auxiliares
+-- Função auxiliar: formatar tempo
 local function formatTime(seconds)
     local h = math.floor(seconds / 3600)
     local m = math.floor((seconds % 3600) / 60)
@@ -2290,6 +2295,7 @@ local function formatTime(seconds)
     return string.format("%02d:%02d:%02d", h, m, s)
 end
 
+-- Função auxiliar: formatar números
 local function formatNumber(n)
     if n >= 1e9 then
         return string.format("%.1fB", n/1e9)
@@ -2302,7 +2308,7 @@ local function formatNumber(n)
     end
 end
 
--- tracking
+-- Iniciar contagem
 local function startTracking()
     if not hasStartedTracking then
         sessionStartStrength = player.leaderstats.Strength.Value
@@ -2315,6 +2321,7 @@ local function startTracking()
     end
 end
 
+-- Atualizar
 local function updateStats()
     if not hasStartedTracking then
         startTracking()
@@ -2348,12 +2355,12 @@ local function updateStats()
     sessionTimeLabel.Text = string.format("Time: %s", formatTime(elapsedTime))
 end
 
--- loop
+-- Loop de atualização
 spawn(function()
     while task.wait(2) do
         updateStats()
     end
-end)
+end))
 
 -- Aura section
 pets:AddLabel("AURAS")
