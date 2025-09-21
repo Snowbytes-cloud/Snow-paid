@@ -2256,9 +2256,9 @@ local sessionStartBrawls = 0
 local hasStartedTracking = false
 
 -- ==============================
--- Aba Stats (separada)
+-- Cria aba Stats no mesmo window do Farm+
 -- ==============================
-local statsTab = _G.window:AddTab("Stats")
+local statsTab = farmPlusTab.Parent:AddTab("Stats")
 local statsFolder = statsTab:AddFolder("Estatísticas")
 
 statsFolder:AddLabel("Strength")
