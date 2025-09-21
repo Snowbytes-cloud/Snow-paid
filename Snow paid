@@ -2244,9 +2244,6 @@ end)
 
 eggFarmFolder:AddLabel("Funções de Egg Farm (By SnowZN)")
 
--- Aura section
-pets:AddLabel("Stats")
-
 local sessionStartTime = os.time()
 local sessionStartStrength = 0
 local sessionStartDurability = 0
