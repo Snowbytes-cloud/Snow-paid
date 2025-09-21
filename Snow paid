@@ -2251,8 +2251,12 @@ local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 
 --==============================
--- NOVA ABA SEPARADA "Stats"
+-- ABA "Stats" (usando o mesmo window já existente)
 --==============================
+-- ⚠️ IMPORTANTE: certifique-se de que 'window' já foi criado antes
+-- Exemplo de criação do window:
+-- local window = library:AddWindow("Meu Hub")
+
 local statsTab = window:AddTab("Stats")
 local statsFolder = statsTab:AddFolder("Estatísticas")
 
@@ -2264,30 +2268,38 @@ local sessionStartRebirths = 0
 local sessionStartBrawls = 0
 local hasStartedTracking = false
 
+-- Labels Strength
 statsFolder:AddLabel("Strength")
 local strengthStatsLabel = statsFolder:AddLabel("Actual: Waiting...")
 local strengthGainLabel = statsFolder:AddLabel("Gained: 0")
 
+-- Labels Durability
 statsFolder:AddLabel("Durability")
 local durabilityStatsLabel = statsFolder:AddLabel("Actual: Waiting...")
 local durabilityGainLabel = statsFolder:AddLabel("Gained: 0")
 
+-- Labels Rebirths
 statsFolder:AddLabel("Rebirths")
 local rebirthsStatsLabel = statsFolder:AddLabel("Actual: Waiting...")
 local rebirthsGainLabel = statsFolder:AddLabel("Gained: 0")
 
+-- Labels Kills
 statsFolder:AddLabel("Kills")
 local killsStatsLabel = statsFolder:AddLabel("Actual: Waiting...")
 local killsGainLabel = statsFolder:AddLabel("Gained: 0")
 
+-- Labels Brawls
 statsFolder:AddLabel("Brawls")
 local brawlsStatsLabel = statsFolder:AddLabel("Actual: Waiting...")
 local brawlsGainLabel = statsFolder:AddLabel("Gained: 0")
 
+-- Label Tempo
 statsFolder:AddLabel("Time Of Session")
 local sessionTimeLabel = statsFolder:AddLabel("Time: 00:00:00")
 
--- Função auxiliar: formatar tempo
+--==============================
+-- Funções auxiliares
+--==============================
 local function formatTime(seconds)
     local h = math.floor(seconds / 3600)
     local m = math.floor((seconds % 3600) / 60)
@@ -2295,7 +2307,6 @@ local function formatTime(seconds)
     return string.format("%02d:%02d:%02d", h, m, s)
 end
 
--- Função auxiliar: formatar números
 local function formatNumber(n)
     if n >= 1e9 then
         return string.format("%.1fB", n/1e9)
@@ -2308,7 +2319,9 @@ local function formatNumber(n)
     end
 end
 
--- Iniciar contagem
+--==============================
+-- Tracking
+--==============================
 local function startTracking()
     if not hasStartedTracking then
         sessionStartStrength = player.leaderstats.Strength.Value
@@ -2321,7 +2334,6 @@ local function startTracking()
     end
 end
 
--- Atualizar
 local function updateStats()
     if not hasStartedTracking then
         startTracking()
