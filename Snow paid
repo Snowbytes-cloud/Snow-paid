@@ -2244,88 +2244,16 @@ end)
 
 eggFarmFolder:AddLabel("Funções de Egg Farm (By SnowZN)")
 
---// Serviços
-local Players = game:GetService("Players")
-local player = Players.LocalPlayer
+local sessionStartTime = os.time()
+local sessionStartStrength = 0
+local sessionStartDurability = 0
+local sessionStartKills = 0
+local sessionStartRebirths = 0
+local sessionStartBrawls = 0
+local hasStartedTracking = false
 
--- ==============================
--- ABA SEPARADA "Stats" (Robusta e com fallback)
--- ==============================
--- OBS: Cole este bloco IMEDIATAMENTE APÓS a criação da aba "Fast Farm" no seu script
+local statsFolder = farmPlusTab:AddFolder("Stats")
 
--- tenta criar uma aba separada; se não for possível, cria pasta como fallback
-local statsFolder
-local createdAsTab = false
-local ok, err = pcall(function()
-    -- se a variável `window` existir e possuir AddTab -> cria aba
-    if type(window) == "table" and type(window.AddTab) == "function" then
-        local statsTab = window:AddTab("Stats") -- aba separada
-        statsFolder = statsTab:AddFolder("Estatísticas")
-        createdAsTab = true
-    else
-        error("window:AddTab não disponível")
-    end
-end)
-
-if not ok then
-    -- fallback: tenta criar dentro de farmPlusTab (não ideal, mas seguro)
-    if type(farmPlusTab) == "table" and type(farmPlusTab.AddFolder) == "function" then
-        statsFolder = farmPlusTab:AddFolder("Stats")
-        warn("window:AddTab não encontrado — Stats criada dentro de farmPlusTab como fallback.")
-    else
-        -- último fallback: cria um objeto leve que não quebra o script
-        warn("Nenhuma API de UI encontrada (window ou farmPlusTab). Stats irá usar fallback virtual — sem UI visível.")
-        statsFolder = {
-            AddLabel = function(_, text)
-                local lbl = { Text = tostring(text) }
-                return lbl
-            end
-        }
-    end
-end
-
--- utilitários (definem-se se não existirem no restante do script)
-local function formatNumber(n)
-    if not n then return "0" end
-    local negative = false
-    local num = tonumber(n) or 0
-    if num < 0 then negative = true; num = math.abs(num) end
-    local s = tostring(math.floor(num))
-    local formatted = s:reverse():gsub("(%d%d%d)", "%1,"):reverse()
-    formatted = formatted:gsub("^,","")
-    if negative then formatted = "-" .. formatted end
-    return formatted
-end
-
-local function formatTime(seconds)
-    seconds = tonumber(seconds) or 0
-    local h = math.floor(seconds / 3600)
-    local m = math.floor((seconds % 3600) / 60)
-    local s = seconds % 60
-    return string.format("%02d:%02d:%02d", h, m, s)
-end
-
-local function safeGetStatValue(playerObj, name)
-    if not playerObj then return 0 end
-    local ok, result = pcall(function()
-        -- procura em leaderstats primeiro
-        if playerObj:FindFirstChild("leaderstats") then
-            local ls = playerObj.leaderstats
-            if ls:FindFirstChild(name) and ls[name].Value ~= nil then
-                return ls[name].Value
-            end
-        end
-        -- depois procura direto no player (ex: Durability que era assim no seu script)
-        if playerObj:FindFirstChild(name) and playerObj[name].Value ~= nil then
-            return playerObj[name].Value
-        end
-        return 0
-    end)
-    if ok and result then return result end
-    return 0
-end
-
--- Cria labels (não lançará erro mesmo que statsFolder seja fallback)
 statsFolder:AddLabel("Strength")
 local strengthStatsLabel = statsFolder:AddLabel("Actual: Waiting...")
 local strengthGainLabel = statsFolder:AddLabel("Gained: 0")
@@ -2349,87 +2277,64 @@ local brawlsGainLabel = statsFolder:AddLabel("Gained: 0")
 statsFolder:AddLabel("Time Of Session")
 local sessionTimeLabel = statsFolder:AddLabel("Time: 00:00:00")
 
--- variáveis de sessão
-local sessionStartTime = os.time()
-local sessionStartStrength = 0
-local sessionStartDurability = 0
-local sessionStartKills = 0
-local sessionStartRebirths = 0
-local sessionStartBrawls = 0
-local hasStartedTracking = false
-
 local function startTracking()
-    if hasStartedTracking then return end
-    local pl = Players.LocalPlayer
-    sessionStartStrength = safeGetStatValue(pl, "Strength")
-    sessionStartDurability = safeGetStatValue(pl, "Durability")
-    sessionStartKills = safeGetStatValue(pl, "Kills")
-    sessionStartRebirths = safeGetStatValue(pl, "Rebirths")
-    sessionStartBrawls = safeGetStatValue(pl, "Brawls")
-    sessionStartTime = os.time()
-    hasStartedTracking = true
+    if not hasStartedTracking then
+        local player = game.Players.LocalPlayer
+        sessionStartStrength = player.leaderstats.Strength.Value
+        sessionStartDurability = player.Durability.Value
+        sessionStartKills = player.leaderstats.Kills.Value
+        sessionStartRebirths = player.leaderstats.Rebirths.Value
+        sessionStartBrawls = player.leaderstats.Brawls.Value
+        sessionStartTime = os.time()
+        hasStartedTracking = true
+    end
 end
 
 local function updateStats()
-    local pl = Players.LocalPlayer
-
+    local player = game.Players.LocalPlayer
+    
     if not hasStartedTracking then
         startTracking()
     end
-
-    local currentStrength = safeGetStatValue(pl, "Strength")
-    local currentDurability = safeGetStatValue(pl, "Durability")
-    local currentKills = safeGetStatValue(pl, "Kills")
-    local currentRebirths = safeGetStatValue(pl, "Rebirths")
-    local currentBrawls = safeGetStatValue(pl, "Brawls")
-
+    
+    local currentStrength = player.leaderstats.Strength.Value
+    local currentDurability = player.Durability.Value
+    local currentKills = player.leaderstats.Kills.Value
+    local currentRebirths = player.leaderstats.Rebirths.Value
+    local currentBrawls = player.leaderstats.Brawls.Value
+    
     local strengthGain = currentStrength - sessionStartStrength
     local durabilityGain = currentDurability - sessionStartDurability
     local killsGain = currentKills - sessionStartKills
     local rebirthsGain = currentRebirths - sessionStartRebirths
     local brawlsGain = currentBrawls - sessionStartBrawls
-
-    -- atualiza labels (compatível com bibliotecas que usam .Text)
-    if strengthStatsLabel and strengthStatsLabel.Text ~= nil then
-        strengthStatsLabel.Text = string.format("Actual: %s", formatNumber(currentStrength))
-        strengthGainLabel.Text = string.format("Gained: %s", formatNumber(strengthGain))
-
-        durabilityStatsLabel.Text = string.format("Actual: %s", formatNumber(currentDurability))
-        durabilityGainLabel.Text = string.format("Gained: %s", formatNumber(durabilityGain))
-
-        rebirthsStatsLabel.Text = string.format("Actual: %s", formatNumber(currentRebirths))
-        rebirthsGainLabel.Text = string.format("Gained: %s", formatNumber(rebirthsGain))
-
-        killsStatsLabel.Text = string.format("Actual: %s", formatNumber(currentKills))
-        killsGainLabel.Text = string.format("Gained: %s", formatNumber(killsGain))
-
-        brawlsStatsLabel.Text = string.format("Actual: %s", formatNumber(currentBrawls))
-        brawlsGainLabel.Text = string.format("Gained: %s", formatNumber(brawlsGain))
-
-        local elapsedTime = os.time() - sessionStartTime
-        sessionTimeLabel.Text = string.format("Time: %s", formatTime(elapsedTime))
-    else
-        -- caso os labels sejam objetos simples do fallback, atualiza o campo Text se existir
-        if strengthStatsLabel then strengthStatsLabel.Text = string.format("Actual: %s", formatNumber(currentStrength)) end
-    end
+    
+    strengthStatsLabel.Text = string.format("Actual: %s", formatNumber(currentStrength))
+    durabilityStatsLabel.Text = string.format("Actual: %s", formatNumber(currentDurability))
+    rebirthsStatsLabel.Text = string.format("Actual: %s", formatNumber(currentRebirths))
+    killsStatsLabel.Text = string.format("Actual: %s", formatNumber(currentKills))
+    brawlsStatsLabel.Text = string.format("Actual: %s", formatNumber(currentBrawls))
+    
+    strengthGainLabel.Text = string.format("Gained: %s", formatNumber(strengthGain))
+    durabilityGainLabel.Text = string.format("Gained: %s", formatNumber(durabilityGain))
+    rebirthsGainLabel.Text = string.format("Gained: %s", formatNumber(rebirthsGain))
+    killsGainLabel.Text = string.format("Gained: %s", formatNumber(killsGain))
+    brawlsGainLabel.Text = string.format("Gained: %s", formatNumber(brawlsGain))
+    
+    local elapsedTime = os.time() - sessionStartTime
+    local timeString = formatTime(elapsedTime)
+    sessionTimeLabel.Text = string.format("Time: %s", timeString)
 end
 
--- primeira atualização e loop
-pcall(updateStats)
+updateStats()
+
 spawn(function()
     while wait(2) do
-        pcall(updateStats)
+        updateStats()
     end
 end)
 
--- Mensagem final: se criou como aba, tudo certo; senão, veja instruções abaixo
-if createdAsTab then
-    print("Stats criada como aba separada com sucesso.")
-else
-    warn("Stats criada como fallback. -> Cole este bloco logo APÓS a criação do Fast Farm para garantir ordem correta.")
-end
 
--- Se continuar com problema: cole aqui as primeiras ~60 linhas do seu script ou o nome da variável do seu 'window' (se não for 'window') para eu ajustar o código automaticamente.
 
 -- Aura section
 pets:AddLabel("AURAS")
