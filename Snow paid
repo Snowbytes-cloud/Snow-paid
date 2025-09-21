@@ -2244,11 +2244,9 @@ end)
 
 eggFarmFolder:AddLabel("Funções de Egg Farm (By SnowZN)")
 
--- garante que estamos pegando o mesmo jogador
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 
--- variáveis iniciais da sessão
 local sessionStartTime = os.time()
 local sessionStartStrength = 0
 local sessionStartDurability = 0
@@ -2257,15 +2255,10 @@ local sessionStartRebirths = 0
 local sessionStartBrawls = 0
 local hasStartedTracking = false
 
--- ==============================
--- CRIA ABA "Stats" SEPARADA
--- ==============================
--- ⚠️ importante: window já deve ter sido criado antes!
--- exemplo: local window = library:AddWindow("Meu Hub")
-local statsTab = window:AddTab("Stats")
+-- Usa o mesmo window do farmPlusTab
+local statsTab = farmPlusTab.Parent:AddTab("Stats")
 local statsFolder = statsTab:AddFolder("Estatísticas")
 
--- labels
 statsFolder:AddLabel("Strength")
 local strengthStatsLabel = statsFolder:AddLabel("Actual: Waiting...")
 local strengthGainLabel = statsFolder:AddLabel("Gained: 0")
@@ -2289,9 +2282,9 @@ local brawlsGainLabel = statsFolder:AddLabel("Gained: 0")
 statsFolder:AddLabel("Time Of Session")
 local sessionTimeLabel = statsFolder:AddLabel("Time: 00:00:00")
 
--- ==============================
+--==============================
 -- Funções auxiliares
--- ==============================
+--==============================
 local function formatTime(seconds)
     local h = math.floor(seconds / 3600)
     local m = math.floor((seconds % 3600) / 60)
@@ -2311,9 +2304,9 @@ local function formatNumber(n)
     end
 end
 
--- ==============================
+--==============================
 -- Tracking
--- ==============================
+--==============================
 local function startTracking()
     if not hasStartedTracking then
         sessionStartStrength = player.leaderstats.Strength.Value
@@ -2330,38 +2323,38 @@ local function updateStats()
     if not hasStartedTracking then
         startTracking()
     end
-
+    
     local currentStrength = player.leaderstats.Strength.Value
     local currentDurability = player.leaderstats.Durability.Value
     local currentKills = player.leaderstats.Kills.Value
     local currentRebirths = player.leaderstats.Rebirths.Value
     local currentBrawls = player.leaderstats.Brawls.Value
-
+    
     local strengthGain = currentStrength - sessionStartStrength
     local durabilityGain = currentDurability - sessionStartDurability
     local killsGain = currentKills - sessionStartKills
     local rebirthsGain = currentRebirths - sessionStartRebirths
     local brawlsGain = currentBrawls - sessionStartBrawls
-
+    
     strengthStatsLabel.Text = string.format("Actual: %s", formatNumber(currentStrength))
     durabilityStatsLabel.Text = string.format("Actual: %s", formatNumber(currentDurability))
     rebirthsStatsLabel.Text = string.format("Actual: %s", formatNumber(currentRebirths))
     killsStatsLabel.Text = string.format("Actual: %s", formatNumber(currentKills))
     brawlsStatsLabel.Text = string.format("Actual: %s", formatNumber(currentBrawls))
-
+    
     strengthGainLabel.Text = string.format("Gained: %s", formatNumber(strengthGain))
     durabilityGainLabel.Text = string.format("Gained: %s", formatNumber(durabilityGain))
     rebirthsGainLabel.Text = string.format("Gained: %s", formatNumber(rebirthsGain))
     killsGainLabel.Text = string.format("Gained: %s", formatNumber(killsGain))
     brawlsGainLabel.Text = string.format("Gained: %s", formatNumber(brawlsGain))
-
+    
     local elapsedTime = os.time() - sessionStartTime
     sessionTimeLabel.Text = string.format("Time: %s", formatTime(elapsedTime))
 end
 
--- ==============================
--- Loop
--- ==============================
+--==============================
+-- Loop de atualização
+--==============================
 spawn(function()
     while task.wait(2) do
         updateStats()
