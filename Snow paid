@@ -2244,6 +2244,147 @@ end)
 
 eggFarmFolder:AddLabel("Funções de Egg Farm (By SnowZN)")
 
+-- Stats Tab Credits Myers
+local statsTab = window:AddTab("Stats")
+
+local leaderstats = Player:WaitForChild("leaderstats")
+local strengthStat = leaderstats:WaitForChild("Strength")
+local rebirthsStat = leaderstats:WaitForChild("Rebirths")
+local durabilityStat = Player:WaitForChild("Durability")
+local killsStat = leaderstats:WaitForChild("Kills")
+local agilityStat = Player:WaitForChild("Agility")
+local evilKarmaStat = Player:WaitForChild("evilKarma")
+local goodKarmaStat = Player:WaitForChild("goodKarma")
+local brawlsStat = leaderstats:WaitForChild("Brawls")
+
+local function AbbrevNumber(num)
+    local abbrev = {"", "K", "M", "B", "T", "Qa", "Qi"}
+    local i = 1
+    while num >= 1000 and i < #abbrev do
+        num = num / 1000
+        i = i + 1
+    end
+    return string.format("%.2f%s", num, abbrev[i])
+end
+
+-- Credits Myers
+statsTab:AddLabel("⏱️ Session Statistics").TextSize = 30
+local stopwatchLabel = statsTab:AddLabel("Session Time: 0d 0h 0m 0s"); stopwatchLabel.TextSize = 20
+local customTimerLabel = statsTab:AddLabel("Custom Timer: Not started"); customTimerLabel.TextSize = 20
+
+local isCustomRunning, customStart, customElapsed = false, 0, 0
+
+statsTab:AddButton("Start/Stop Custom Timer", function()
+    if not isCustomRunning then
+        isCustomRunning = true
+        customStart = tick() - customElapsed
+    else
+        isCustomRunning = false
+        customElapsed = tick() - customStart
+    end
+end)
+
+statsTab:AddButton("Reset Custom Timer", function()
+    isCustomRunning = false
+    customStart, customElapsed = 0, 0
+    customTimerLabel.Text = "Custom Timer: Not started"
+end)
+
+local resetSession = false
+statsTab:AddButton("Reset Session Stats", function()
+    resetSession = true
+end)
+
+statsTab:AddLabel("------------------").TextSize = 14
+statsTab:AddLabel("Projected Stats").TextSize = 30
+local projectedStrengthLabel = statsTab:AddLabel("Strength Pace: -"); projectedStrengthLabel.TextSize = 20
+local projectedDurabilityLabel = statsTab:AddLabel("Durability Pace: -"); projectedDurabilityLabel.TextSize = 20
+local projectedRebirthsLabel = statsTab:AddLabel("Rebirth Pace: -"); projectedRebirthsLabel.TextSize = 20
+
+statsTab:AddLabel("------------------").TextSize = 14
+statsTab:AddLabel("📊 Leaderboard Stats").TextSize = 30
+local strengthLabel = statsTab:AddLabel("Strength: -"); strengthLabel.TextSize = 20
+local rebirthsLabel = statsTab:AddLabel("Rebirths: -"); rebirthsLabel.TextSize = 20
+local killsLabel = statsTab:AddLabel("Kills: -"); killsLabel.TextSize = 20
+local brawlsLabel = statsTab:AddLabel("Brawls: -"); brawlsLabel.TextSize = 20
+
+statsTab:AddLabel("------------------").TextSize = 14
+statsTab:AddLabel("💪 Player Stats").TextSize = 30
+local goodKarmaLabel = statsTab:AddLabel("Good Karma: -"); goodKarmaLabel.TextSize = 20
+local evilKarmaLabel = statsTab:AddLabel("Evil Karma: -"); evilKarmaLabel.TextSize = 20
+local durabilityLabel = statsTab:AddLabel("Durability: -"); durabilityLabel.TextSize = 20
+local agilityLabel = statsTab:AddLabel("Agility: -"); agilityLabel.TextSize = 20
+
+-- Credits Myers
+local startTime = tick()
+local initialStrength = strengthStat.Value
+local initialDurability = durabilityStat.Value
+local initialRebirths = rebirthsStat.Value
+local initialKills = killsStat.Value
+local initialAgility = agilityStat.Value
+local initialEvilKarma = evilKarmaStat.Value
+local initialGoodKarma = goodKarmaStat.Value
+local initialBrawls = brawlsStat.Value
+
+-- Credits Myers
+task.spawn(function()
+    local lastUpdate = 0
+    while task.wait(0.2) do
+        local elapsedTime = tick() - startTime
+        local days = math.floor(elapsedTime / (24 * 3600))
+        local hours = math.floor((elapsedTime % (24 * 3600)) / 3600)
+        local minutes = math.floor((elapsedTime % 3600) / 60)
+        local seconds = math.floor(elapsedTime % 60)
+        stopwatchLabel.Text = string.format("Session Time: %dd %dh %dm %ds", days, hours, minutes, seconds)
+
+        if isCustomRunning then customElapsed = tick() - customStart end
+        if customElapsed > 0 then
+            local d = math.floor(customElapsed / (24 * 3600))
+            local h = math.floor((customElapsed % (24 * 3600)) / 3600)
+            local m = math.floor((customElapsed % 3600) / 60)
+            local s = math.floor(customElapsed % 60)
+            customTimerLabel.Text = string.format("Custom Timer: %dd %dh %dm %ds", d, h, m, s)
+        end
+
+        if resetSession then
+            startTime = tick()
+            initialStrength = strengthStat.Value
+            initialDurability = durabilityStat.Value
+            initialRebirths = rebirthsStat.Value
+            initialKills = killsStat.Value
+            initialAgility = agilityStat.Value
+            initialEvilKarma = evilKarmaStat.Value
+            initialGoodKarma = goodKarmaStat.Value
+            initialBrawls = brawlsStat.Value
+            resetSession = false
+        end
+
+        local cStr, cReb, cDur = strengthStat.Value, rebirthsStat.Value, durabilityStat.Value
+        local cKills, cAgi, cEvil, cGood, cBrawl = killsStat.Value, agilityStat.Value, evilKarmaStat.Value, goodKarmaStat.Value, brawlsStat.Value
+
+        local dStr, dDur, dReb = cStr - initialStrength, cDur - initialDurability, cReb - initialRebirths
+        local dKills, dAgi, dEvil, dGood, dBrawl = cKills - initialKills, cAgi - initialAgility, cEvil - initialEvilKarma, cGood - initialGoodKarma, cBrawl - initialBrawls
+
+        strengthLabel.Text = "Strength: " .. AbbrevNumber(cStr) .. " | +" .. AbbrevNumber(dStr)
+        rebirthsLabel.Text = "Rebirths: " .. AbbrevNumber(cReb) .. " | +" .. AbbrevNumber(dReb)
+        killsLabel.Text = "Kills: " .. AbbrevNumber(cKills) .. " | +" .. AbbrevNumber(dKills)
+        brawlsLabel.Text = "Brawls: " .. AbbrevNumber(cBrawl) .. " | +" .. AbbrevNumber(dBrawl)
+        goodKarmaLabel.Text = "Good Karma: " .. AbbrevNumber(cGood) .. " | +" .. AbbrevNumber(dGood)
+        evilKarmaLabel.Text = "Evil Karma: " .. AbbrevNumber(cEvil) .. " | +" .. AbbrevNumber(dEvil)
+        durabilityLabel.Text = "Durability: " .. AbbrevNumber(cDur) .. " | +" .. AbbrevNumber(dDur)
+        agilityLabel.Text = "Agility: " .. AbbrevNumber(cAgi) .. " | +" .. AbbrevNumber(dAgi)
+
+        if tick() - lastUpdate >= 6 then
+            lastUpdate = tick()
+            local sSec, dSec, rSec = dStr / elapsedTime, dDur / elapsedTime, dReb / elapsedTime
+            local h, d, m = 3600, 86400, 2592000
+            projectedStrengthLabel.Text = "Strength Pace: " .. AbbrevNumber(math.floor(sSec*h)) .. "/h | " .. AbbrevNumber(math.floor(sSec*d)) .. "/d"
+            projectedDurabilityLabel.Text = "Durability Pace: " .. AbbrevNumber(math.floor(dSec*h)) .. "/h | " .. AbbrevNumber(math.floor(dSec*d)) .. "/d"
+            projectedRebirthsLabel.Text = "Rebirth Pace: " .. AbbrevNumber(math.floor(rSec*h)) .. "/h | " .. AbbrevNumber(math.floor(rSec*d)) .. "/d | " .. AbbrevNumber(math.floor(rSec*m)) .. "/month"
+        end
+    end
+end)
+
 -- Aura section
 pets:AddLabel("AURAS")
 
